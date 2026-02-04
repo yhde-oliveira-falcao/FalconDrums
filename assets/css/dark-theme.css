@@ -1,0 +1,198 @@
+:root {
+    --bg-color: #121212;
+    --bg-secondary: #1e1e1e;
+    --text-color: #e0e0e0;
+    --text-muted: #b0b0b0;
+    --accent-color: #d4af37;
+    /* Gold/Bronze like drum cymbals */
+    --accent-hover: #b59020;
+    --header-bg: rgba(18, 18, 18, 0.95);
+    --border-color: #333;
+}
+
+body,
+.landing {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Open Sans', 'Helvetica Neue', sans-serif;
+    /* Modern clean font */
+}
+
+/* Typography Overrides */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    color: #ffffff;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+p {
+    color: var(--text-muted);
+}
+
+a {
+    color: var(--accent-color);
+    transition: color 0.3s ease;
+    border-bottom-color: transparent;
+}
+
+a:hover {
+    color: var(--accent-hover);
+}
+
+/* Header */
+#header {
+    background: var(--header-bg);
+    border-bottom: none;
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+#header h1 {
+    display: flex;
+    align-items: center;
+    margin: 0;
+}
+
+#header .logo-img {
+    height: 50px;
+    /* Adjust based on logo needs */
+    width: auto;
+    filter: invert(1);
+    /* Invert to make it white/light on dark bg if strictly black */
+}
+
+/* Navigation */
+
+
+#menu {
+    background-color: #2a2a2a;
+}
+
+#nav ul li a {
+    color: #fff;
+    font-weight: 500;
+}
+
+/* Sections */
+.wrapper.style1 {
+    background-color: var(--bg-secondary);
+}
+
+.wrapper.style2 {
+    background-color: var(--bg-color);
+}
+
+.wrapper.style3 {
+    background-color: var(--bg-secondary);
+}
+
+.wrapper.style4 {
+    background-color: rgba(18, 18, 18, 0.8);
+}
+
+/* Spotlight (Alternating sections) */
+.spotlight {
+    box-shadow: none;
+    border-bottom: 0px solid var(--border-color);
+    /* Animation Init State */
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 1s ease, transform 1s ease;
+    will-change: opacity, transform;
+}
+
+.spotlight.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.spotlight .content {
+    background-color: transparent;
+    border-color: transparent;
+}
+
+.spotlight:nth-child(2n) {
+    background-color: var(--bg-secondary);
+}
+
+.spotlight:nth-child(2n + 1) {
+    background-color: var(--bg-color);
+}
+
+/* Buttons */
+input[type="submit"],
+input[type="reset"],
+input[type="button"],
+button,
+.button {
+    background-color: transparent;
+    color: var(--accent-color) !important;
+    border: 2px solid var(--accent-color);
+    border-radius: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+input[type="submit"]:hover,
+input[type="reset"]:hover,
+input[type="button"]:hover,
+button:hover,
+.button:hover {
+    background-color: var(--accent-color);
+    color: #000 !important;
+    border-color: var(--accent-color);
+}
+
+.button.primary {
+    background-color: var(--accent-color);
+    color: #000 !important;
+    border-color: var(--accent-color);
+}
+
+.button.primary:hover {
+    background-color: var(--accent-hover);
+    border-color: var(--accent-hover);
+}
+
+/* Form */
+input[type="text"],
+input[type="password"],
+input[type="email"],
+select,
+textarea {
+    background-color: #2a2a2a;
+    border: 1px solid var(--border-color);
+    color: #fff;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="email"]:focus,
+select:focus,
+textarea:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 1px var(--accent-color);
+}
+
+/* Footer */
+#footer {
+    background-color: #050505;
+    color: var(--text-muted);
+}
+
+/* Logic Fixes */
+#header.alt h1 {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}
+
+/* Desktop Header Resize Additions */
