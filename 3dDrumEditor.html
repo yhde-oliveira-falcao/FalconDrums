@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>3dDrumEditor</title>
+    <link rel="icon" type="image/png" href="images/logo.png">
+    <link rel="stylesheet" href="assets/css/main.css" />
+    <noscript>
+        <link rel="stylesheet" href="assets/css/noscript.css" />
+    </noscript>
+    <link rel="stylesheet" href="assets/css/dark-theme.css" />
+    <style>
+        :root {
+            --bg: #121212;
+            --panel: #1e1e1e;
+            --text: #e0e0e0;
+            --muted: #b0b0b0;
+            --accent: #d4af37;
+            --accent-hover: #b59020;
+            --border: #333;
+            --radius: 4px;
+            --font: 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font);
+        }
+
+        /* MAIN LAYOUT */
+        .configurator {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr;
+            min-height: 100vh;
+        }
+
+        /* LEFT: 3D VIEWER */
+        .viewer {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            background: radial-gradient(circle at top, #1a1a1a, #000);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-right: 1px solid var(--border);
+        }
+
+        .viewer-placeholder {
+            width: 70%;
+            height: 70%;
+            border: 1px dashed var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        #viewer3d {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* RIGHT: CONFIG PANEL */
+        .panel {
+            padding: 32px;
+            background: var(--panel);
+            overflow-y: auto;
+        }
+
+        .panel h1 {
+            margin: 0 0 8px;
+            font-size: 28px;
+            letter-spacing: 0.5px;
+        }
+
+        .panel .subtitle {
+            color: var(--muted);
+            margin-bottom: 32px;
+        }
+
+        .section {
+            margin-bottom: 32px;
+        }
+
+        .section h2 {
+            font-size: 14px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            color: #ffffff;
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 12px;
+        }
+
+        .option {
+            padding: 12px;
+            background: #0f0f0f;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .option.active {
+            border-color: #ffffff;
+        }
+
+        /* COLOR SWATCHES */
+        .color-options {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+        }
+
+        .color-swatch {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 3px solid var(--border);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .color-swatch:hover {
+            transform: scale(1.1);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .color-swatch.active {
+            border-color: #ffffff;
+            border-width: 4px;
+            transform: scale(1.15);
+        }
+
+        .color-swatch.active::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-weight: bold;
+            font-size: 20px;
+            text-shadow: 0 0 3px rgba(0, 0, 0, 0.8);
+        }
+
+        /* SUMMARY */
+        .summary {
+            border-top: 1px solid var(--border);
+            padding-top: 24px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .cta {
+            margin-top: 24px;
+            width: 100%;
+            padding: 14px;
+            background: transparent;
+            color: #ffffff !important;
+            border: 2px solid #ffffff;
+            border-radius: var(--radius);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .cta:hover {
+            background: #ffffff;
+            color: #000 !important;
+            border-color: #ffffff;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 900px) {
+            .configurator {
+                grid-template-columns: 1fr;
+            }
+
+            .viewer {
+                position: relative;
+                height: 50vh;
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+            }
+        }
+    </style>
+</head>
+
+<body class="landing is-preload">
+
+    <!-- Page Wrapper -->
+
+    <div id="page-wrapper">
+
+        <!-- Header -->
+        <header id="header" class="alt">
+            <h1><a href="index.html"><img src="images/logo.png" alt="Falcon Drums" class="logo-img"></a></h1>
+            <nav id="nav">
+                <ul>
+                    <li class="special">
+                        <a href="#menu" class="menuToggle"><span>Menu</span></a>
+                        <div id="menu">
+                            <ul>
+                                <li><a href="index.html">Home</a></li>
+                                <li><a href="snares.html">Snare Drums</a></li>
+                                <li><a href="3dDrumEditor.html">Customize Your Snare</a></li>
+                            </ul>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+        </header>
+
+        <main class="configurator">
+
+            <section class="viewer">
+                <canvas id="viewer3d"></canvas>
+                <div id="loading" style="position: absolute; color: #d4af37; font-size: 14px;">
+                    Loading 3D model...
+                </div>
+            </section>
+
+            <aside class="panel">
+                <h1>Build Your Snare</h1>
+                <div class="subtitle">14″ × 6.5″ Snare Drum</div>
+
+                <div class="section">
+                    <h2>Shell Color</h2>
+                    <div class="color-options">
+                        <div class="color-swatch active" style="background-color: #1a1a1a;" data-color="#1a1a1a"
+                            title="Black"></div>
+                        <div class="color-swatch" style="background-color: #f5f5f5;" data-color="#f5f5f5" title="White">
+                        </div>
+                        <div class="color-swatch" style="background-color: #c41e3a;" data-color="#c41e3a" title="Red">
+                        </div>
+                        <div class="color-swatch" style="background-color: #0051ba;" data-color="#0051ba" title="Blue">
+                        </div>
+                        <div class="color-swatch" style="background-color: #2d5f3f;" data-color="#2d5f3f"
+                            title="Forest Green"></div>
+                        <div class="color-swatch" style="background-color: #663399;" data-color="#663399"
+                            title="Purple"></div>
+                        <div class="color-swatch" style="background-color: #8b6f47;" data-color="#8b6f47"
+                            title="Natural Wood"></div>
+                        <div class="color-swatch" style="background-color: #ff6600;" data-color="#ff6600"
+                            title="Orange"></div>
+                        <div class="color-swatch" style="background-color: #ffd700;" data-color="#ffd700" title="Gold">
+                        </div>
+                        <div class="color-swatch" style="background-color: #c0c0c0;" data-color="#c0c0c0"
+                            title="Silver"></div>
+                    </div>
+
+                </div>
+
+                <div class="section" style="display: none;">
+                    <h2>Hoops</h2>
+                    <div class="options">
+                        <div class="option active">Chrome</div>
+                        <div class="option">Black</div>
+                        <div class="option">Brass</div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2>Size</h2>
+                    <div class="options">
+                        <div class="option active">14 × 6.5</div>
+                        <div class="option">14 × 5</div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2>Background</h2>
+                    <div class="bg-options" style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px;">
+                        <div class="bg-swatch active"
+                            style="background-color: #0a0a0a; width: 40px; height: 40px; border-radius: 50%; border: 2px solid #555; cursor: pointer;"
+                            data-color="#0a0a0a" title="Black"></div>
+                        <div class="bg-swatch"
+                            style="background-color: #ffffff; width: 40px; height: 40px; border-radius: 50%; border: 2px solid #555; cursor: pointer;"
+                            data-color="#ffffff" title="White"></div>
+                        <div class="bg-swatch"
+                            style="background-color: #808080; width: 40px; height: 40px; border-radius: 50%; border: 2px solid #555; cursor: pointer;"
+                            data-color="#808080" title="Grey"></div>
+                        <div class="bg-swatch"
+                            style="background-color: #87CEEB; width: 40px; height: 40px; border-radius: 50%; border: 2px solid #555; cursor: pointer;"
+                            data-color="#87CEEB" title="Sky Blue"></div>
+                        <div class="bg-swatch"
+                            style="background-color: #F5F5DC; width: 40px; height: 40px; border-radius: 50%; border: 2px solid #555; cursor: pointer;"
+                            data-color="#F5F5DC" title="Beige"></div>
+                        <div class="bg-swatch"
+                            style="background-color: #C4A484; width: 40px; height: 40px; border-radius: 50%; border: 2px solid #555; cursor: pointer;"
+                            data-color="#C4A484" title="Light Brown"></div>
+                    </div>
+                </div>
+
+                <div class="summary" style="display: none;">
+                    <div class="summary-row">
+                        <span>Total</span>
+                        <strong>$—</strong>
+                    </div>
+                    <button class="cta">Save Configuration</button>
+                </div>
+            </aside>
+
+        </main>
+
+        <!-- Footer -->
+        <footer id="footer">
+            <ul class="icons">
+                <li><a href="#" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
+                <li><a href="#" class="icon solid fa-envelope"><span class="label">Email</span></a></li>
+            </ul>
+            <ul class="icons">
+                <div class="image"> <img src="images/canadaFlag.png" alt="Canadian Flag"
+                        style="width: 50px; height: auto;" /></div>
+            </ul>
+            <ul class="copyright">
+                <li>&copy; All Rights Reserved</li>
+                <li>A Website by: <a href="http://programcoffee.ca">Program Coffee</a></li>
+            </ul>
+        </footer>
+
+    </div>
+
+    <!-- Scripts -->
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/jquery.scrollex.min.js"></script>
+    <script src="assets/js/jquery.scrolly.min.js"></script>
+    <script src="assets/js/browser.min.js"></script>
+    <script src="assets/js/breakpoints.min.js"></script>
+    <script src="assets/js/util.js"></script>
+    <script src="assets/js/main.js"></script>
+
+    <!-- Three.js Library -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+        console.log('✓ Three.js modules imported successfully');
+        console.log('Three.js version:', THREE.REVISION);
+
+        // Get the canvas element
+        const canvas = document.getElementById('viewer3d');
+
+        if (!canvas) {
+            console.error('✗ Canvas element not found!');
+        } else {
+            console.log('✓ Canvas element found:', canvas);
+        }
+
+        // Scene setup
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x0a0a0a);
+
+        // Camera setup
+        const camera = new THREE.PerspectiveCamera(
+            45,
+            canvas.clientWidth / canvas.clientHeight,
+            0.1,
+            1000
+        );
+        camera.position.set(0, 5, 15);
+
+        // Renderer setup
+        const renderer = new THREE.WebGLRenderer({
+            canvas: canvas,
+            antialias: true,
+            alpha: true
+        });
+        renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.outputColorSpace = THREE.SRGBColorSpace;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.2;
+
+        // OrbitControls - enables interactive rotation, zoom, and pan
+        const controls = new OrbitControls(camera, canvas);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.minDistance = 5;
+        controls.maxDistance = 30;
+        controls.target.set(0, 0, 0);
+        controls.enablePan = true;
+        controls.panSpeed = 0.8;
+        controls.rotateSpeed = 0.8;
+        controls.autoRotate = false; // Set to true for auto-rotation
+        controls.autoRotateSpeed = 1.0;
+
+        // Lighting setup for premium look
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+
+        const mainLight = new THREE.DirectionalLight(0xffffff, 1.2);
+        mainLight.position.set(5, 10, 7.5);
+        mainLight.castShadow = true;
+        mainLight.shadow.camera.near = 0.1;
+        mainLight.shadow.camera.far = 50;
+        mainLight.shadow.camera.left = -10;
+        mainLight.shadow.camera.right = 10;
+        mainLight.shadow.camera.top = 10;
+        mainLight.shadow.camera.bottom = -10;
+        mainLight.shadow.mapSize.width = 2048;
+        mainLight.shadow.mapSize.height = 2048;
+        scene.add(mainLight);
+
+        const fillLight = new THREE.DirectionalLight(0xc9a24d, 0.4);
+        fillLight.position.set(-5, 3, -5);
+        scene.add(fillLight);
+
+        const rimLight = new THREE.PointLight(0xffffff, 0.6);
+        rimLight.position.set(0, 8, -10);
+        scene.add(rimLight);
+
+        // Add subtle environment lighting
+        const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.3);
+        hemiLight.position.set(0, 20, 0);
+        scene.add(hemiLight);
+
+        // Load the 3D model
+        const loader = new GLTFLoader();
+        let drumModel;
+
+        const loadingElement = document.getElementById('loading');
+
+        console.log('Starting to load 3D model from: ./3dObjects/SnareDrumShell14x5.5.glb');
+        console.log('Canvas size:', canvas.clientWidth, 'x', canvas.clientHeight);
+
+        loader.load(
+            './3dObjects/SnareDrumShell14x5.5.glb',
+            function (gltf) {
+                drumModel = gltf.scene;
+
+                console.log('✓ Model loaded successfully!', gltf);
+
+                // Center and scale the model
+                const box = new THREE.Box3().setFromObject(drumModel);
+                const center = box.getCenter(new THREE.Vector3());
+                const size = box.getSize(new THREE.Vector3());
+
+                console.log('Model center:', center);
+                console.log('Model size:', size);
+
+                // Center the model
+                drumModel.position.x = -center.x;
+                drumModel.position.y = -center.y;
+                drumModel.position.z = -center.z;
+
+                // Scale to appropriate size
+                const maxDim = Math.max(size.x, size.y, size.z);
+                const scale = 8 / maxDim;
+                drumModel.scale.setScalar(scale);
+
+                console.log('Applied scale:', scale);
+
+                // Enable shadows
+                drumModel.traverse((child) => {
+                    if (child.isMesh) {
+                        child.castShadow = true;
+                        child.receiveShadow = true;
+
+                        // Enhance material properties for better appearance
+                        if (child.material) {
+                            child.material.needsUpdate = true;
+                        }
+                    }
+                });
+
+                scene.add(drumModel);
+
+                // Hide loading indicator
+                if (loadingElement) {
+                    loadingElement.style.display = 'none';
+                }
+
+                console.log('✓ 3D Drum model added to scene successfully!');
+                console.log('Scene children:', scene.children.length);
+            },
+            function (xhr) {
+                const percentComplete = (xhr.loaded / xhr.total) * 100;
+                console.log('Loading progress: ' + percentComplete.toFixed(2) + '%');
+                if (loadingElement) {
+                    loadingElement.textContent = `Loading 3D model... ${percentComplete.toFixed(0)}%`;
+                }
+            },
+            function (error) {
+                console.error('✗ Error loading 3D model:', error);
+                console.error('Error details:', error.message);
+                if (loadingElement) {
+                    loadingElement.textContent = 'Error loading model. Check console for details.';
+                    loadingElement.style.color = '#ff5555';
+                }
+            }
+        );
+
+        // Handle window resize
+        function onWindowResize() {
+            const width = canvas.clientWidth;
+            const height = canvas.clientHeight;
+
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+
+            renderer.setSize(width, height);
+        }
+
+        window.addEventListener('resize', onWindowResize);
+
+        // Color changing logic
+        function updateShellColor(colorHex) {
+            if (!drumModel) return;
+
+            const color = new THREE.Color(colorHex);
+
+            drumModel.traverse((child) => {
+                if (child.isMesh) {
+                    const name = child.name.toLowerCase();
+                    const matName = child.material ? child.material.name.toLowerCase() : '';
+
+                    // IF it is explicitly the shell, color it and skip other checks
+                    if (name.includes('shell') || name.includes('body')) {
+                        child.material.color.set(color);
+                        return;
+                    }
+
+                    // Heuristic: Try to avoid coloring hardware (lugs, hoops, screws)
+                    if (name.includes('lug') || name.includes('hoop') || name.includes('screw') || name.includes('tension') ||
+                        matName.includes('chrome') || matName.includes('metal') || matName.includes('steel')) {
+                        return;
+                    }
+
+                    // Apply color to other potential shell parts
+                    child.material.color.set(color);
+                }
+            });
+        }
+
+        // Background changing logic
+        function updateBackground(colorHex) {
+            scene.background = new THREE.Color(colorHex);
+            // Optional: Adjust lighting or fog if needed, but simple color change is requested.
+        }
+
+        document.body.addEventListener('click', (e) => {
+            // Shell Color Logic
+            if (e.target.classList.contains('color-swatch') || e.target.closest('.color-swatch')) {
+                const swatch = e.target.classList.contains('color-swatch') ? e.target : e.target.closest('.color-swatch');
+
+                // UI update
+                document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+                swatch.classList.add('active');
+
+                // Model Update
+                const color = swatch.getAttribute('data-color');
+                updateShellColor(color);
+            }
+
+            // Background Color Logic
+            if (e.target.classList.contains('bg-swatch') || e.target.closest('.bg-swatch')) {
+                const swatch = e.target.classList.contains('bg-swatch') ? e.target : e.target.closest('.bg-swatch');
+
+                // UI update
+                document.querySelectorAll('.bg-swatch').forEach(s => {
+                    s.classList.remove('active');
+                    s.style.borderColor = '#555'; // Reset border
+                });
+                swatch.classList.add('active');
+                swatch.style.borderColor = '#ffffff'; // Highlight active
+
+                // Scene Update
+                const color = swatch.getAttribute('data-color');
+                updateBackground(color);
+            }
+        });
+
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+
+            controls.update(); // Required for damping
+
+            renderer.render(scene, camera);
+        }
+
+        animate();
+    </script>
+
+</body>
+
+</html>
