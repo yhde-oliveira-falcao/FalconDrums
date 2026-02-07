@@ -279,10 +279,11 @@
                             title="Natural Wood"></div>
                         <div class="color-swatch" style="background-color: #ff6600;" data-color="#ff6600"
                             title="Orange"></div>
-                        <div class="color-swatch" style="background-color: #ffd700;" data-color="#ffd700" title="Gold">
+                        <div class="color-swatch" style="background-color: #ffd700;" data-color="#ffd700" title="Gold"
+                            data-metalness="0.7" data-roughness="0.4">
                         </div>
-                        <div class="color-swatch" style="background-color: #c0c0c0;" data-color="#c0c0c0"
-                            title="Silver"></div>
+                        <div class="color-swatch" style="background-color: #c0c0c0;" data-color="#c0c0c0" title="Silver"
+                            data-metalness="0.7" data-roughness="0.4"></div>
                     </div>
 
                 </div>
@@ -317,10 +318,10 @@
                             data-color="#ff6600" title="Orange"></div>
                         <div class="lug-swatch"
                             style="background-color: #ffd700; width: 50px; height: 50px; border-radius: 50%; border: 3px solid #333; cursor: pointer; transition: all 0.3s ease; position: relative;"
-                            data-color="#ffd700" title="Gold"></div>
+                            data-color="#ffd700" title="Gold" data-metalness="0.7" data-roughness="0.4"></div>
                         <div class="lug-swatch"
                             style="background-color: #c0c0c0; width: 50px; height: 50px; border-radius: 50%; border: 3px solid #333; cursor: pointer; transition: all 0.3s ease; position: relative;"
-                            data-color="#c0c0c0" title="Silver"></div>
+                            data-color="#c0c0c0" title="Silver" data-metalness="0.7" data-roughness="0.4"></div>
                     </div>
                 </div>
 
@@ -417,6 +418,7 @@
         import * as THREE from 'three';
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
         import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+        import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
         console.log('✓ Three.js modules imported successfully');
         console.log('Three.js version:', THREE.REVISION);
@@ -455,7 +457,11 @@
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         renderer.outputColorSpace = THREE.SRGBColorSpace;
         renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        renderer.toneMappingExposure = 1.2;
+        renderer.toneMappingExposure = 1.0;
+
+        // Environment setup (Studio Lighting)
+        const pmremGenerator = new THREE.PMREMGenerator(renderer);
+        scene.environment = pmremGenerator.fromScene(new RoomEnvironment(), 0.04).texture;
 
         // OrbitControls - enables interactive rotation, zoom, and pan
         const controls = new OrbitControls(camera, canvas);
@@ -471,10 +477,10 @@
         controls.autoRotateSpeed = 1.0;
 
         // Lighting setup for premium look
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        const ambientLight = new THREE.AmbientLight(0xffffff, 1.1);
         scene.add(ambientLight);
 
-        const mainLight = new THREE.DirectionalLight(0xffffff, 1.2);
+        const mainLight = new THREE.DirectionalLight(0xffffff, 1.5);
         mainLight.position.set(5, 10, 7.5);
         mainLight.castShadow = true;
         mainLight.shadow.camera.near = 0.1;
@@ -487,22 +493,64 @@
         mainLight.shadow.mapSize.height = 2048;
         scene.add(mainLight);
 
-        const fillLight = new THREE.DirectionalLight(0xc9a24d, 0.4);
+        const fillLight = new THREE.DirectionalLight(0xc9a24d, 0.8);
         fillLight.position.set(-5, 3, -5);
         scene.add(fillLight);
 
-        const rimLight = new THREE.PointLight(0xffffff, 0.6);
+        const rimLight = new THREE.PointLight(0xffffff, 1.0);
         rimLight.position.set(0, 8, -10);
         scene.add(rimLight);
 
         // Add subtle environment lighting
-        const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.3);
+        const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.6);
         hemiLight.position.set(0, 20, 0);
         scene.add(hemiLight);
+
+        // Generate a procedural 3D print layer texture (Bump Map)
+        function createPrintTexture() {
+            const width = 512;
+            const height = 512;
+
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+
+            const ctx = canvas.getContext('2d');
+
+            // Fill background
+            ctx.fillStyle = '#808080'; // Middle gray
+            ctx.fillRect(0, 0, width, height);
+
+            // Draw horizontal lines to simulate layers
+            // FDM layers are usually 0.1mm - 0.3mm. 
+            // Scaled to texture, let's say ~200-300 lines.
+            const numLines = 400;
+            const step = height / numLines;
+
+            for (let i = 0; i < numLines; i++) {
+                const y = i * step;
+                // Slight variation in intensity
+                const intensity = 100 + Math.random() * 50;
+                const color = `rgb(${intensity}, ${intensity}, ${intensity})`;
+
+                ctx.fillStyle = color;
+                ctx.fillRect(0, y, width, step * 0.8); // Leave a small gap
+            }
+
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.wrapS = THREE.RepeatWrapping;
+            texture.wrapT = THREE.RepeatWrapping;
+            texture.repeat.set(1, 1); // Adjust repeats based on scale later
+
+            return texture;
+        }
 
         // Load the 3D model
         const loader = new GLTFLoader();
         let drumModel;
+
+        // Generate texture
+        const printTexture = createPrintTexture();
 
         const loadingElement = document.getElementById('loading');
         // Add timestamp to prevent caching
@@ -531,6 +579,15 @@
                         // Clone material to ensure unique instances for independent coloring
                         if (child.material) {
                             child.material = child.material.clone();
+
+                            // Apply 3D print texture
+                            child.material.bumpMap = printTexture;
+                            child.material.bumpScale = 0.005; // Subtle effect
+
+                            // Adjust texture tiling based on object size if possible, 
+                            // or just use a sensible default. 
+                            // Since UVs might vary, we might need to rely on the model's UV mapping.
+                            // Assuming the model is unwrapped reasonably well.
                         }
                     }
                 });
@@ -588,9 +645,9 @@
         window.addEventListener('resize', onWindowResize);
 
         // Color changing logic
-        function updateShellColor(colorHex) {
+        function updateShellColor(colorHex, metalness = 0.0, roughness = 0.5) {
             if (!drumModel) return;
-            console.log('Updating Shell Color to:', colorHex);
+            console.log(`Updating Shell: Color=${colorHex}, Metal=${metalness}, Rough=${roughness}`);
 
             const color = new THREE.Color(colorHex);
 
@@ -601,16 +658,19 @@
 
                     // Logic: Lugs005 is the shell.
                     if (cleanName.includes('lugs005') || name.includes('shell') || name.includes('body')) {
-                        console.log('Setting Shell Color on:', child.name);
+                        console.log('Setting Shell Props on:', child.name);
                         child.material.color.set(color);
+                        child.material.metalness = metalness;
+                        child.material.roughness = roughness;
+                        child.material.needsUpdate = true;
                     }
                 }
             });
         }
 
-        function updateLugColor(colorHex) {
+        function updateLugColor(colorHex, metalness = 0.0, roughness = 0.5) {
             if (!drumModel) return;
-            console.log('Updating Lug Color to:', colorHex);
+            console.log(`Updating Lugs: Color=${colorHex}, Metal=${metalness}, Rough=${roughness}`);
 
             const color = new THREE.Color(colorHex);
 
@@ -621,8 +681,11 @@
 
                     // Target Lugs.* BUT exclude the shell (Lugs005)
                     if (cleanName.includes('lugs') && !cleanName.includes('lugs005')) {
-                        console.log('Setting Lug Color on:', child.name);
+                        console.log('Setting Lug Props on:', child.name);
                         child.material.color.set(color);
+                        child.material.metalness = metalness;
+                        child.material.roughness = roughness;
+                        child.material.needsUpdate = true;
                     }
                 }
             });
@@ -644,7 +707,9 @@
 
                 // Model Update
                 const color = swatch.getAttribute('data-color');
-                updateShellColor(color);
+                const metalness = parseFloat(swatch.getAttribute('data-metalness')) || 0.0;
+                const roughness = parseFloat(swatch.getAttribute('data-roughness')) || 0.5;
+                updateShellColor(color, metalness, roughness);
             }
 
             // Lug Color Logic
@@ -657,7 +722,9 @@
 
                 // Model Update
                 const color = swatch.getAttribute('data-color');
-                updateLugColor(color);
+                const metalness = parseFloat(swatch.getAttribute('data-metalness')) || 0.0;
+                const roughness = parseFloat(swatch.getAttribute('data-roughness')) || 0.5;
+                updateLugColor(color, metalness, roughness);
             }
 
             // Background Color Logic
