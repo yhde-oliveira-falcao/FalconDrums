@@ -14,13 +14,13 @@
 	<link rel="stylesheet" href="assets/css/dark-theme.css" />
 </head>
 
-<body class="is-preload">
+<body class="landing is-preload">
 
 	<!-- Page Wrapper -->
 	<div id="page-wrapper">
 
 		<!-- Header -->
-		<header id="header">
+		<header id="header" class="alt">
 			<h1><a href="index.html"><img src="images/logo.png" alt="Falcon Drums" class="logo-img"></a></h1>
 			<nav id="nav">
 				<ul>
@@ -81,11 +81,28 @@
 					</section>
 
 
-					<section id="three" class="wrapper style4">
-						<form method="post" action="https://formspree.io/f/mnnnldlz" class="inner">
-							<header class="major">
-								<h3>Interested? Send Us a Message</h3>
+
+					<section id="three"
+						style="background-color: #ffffff; padding: 40px; border-radius: 4px; margin-bottom: 32px;">
+						<form method="post" action="https://formspree.io/f/mnnnldlz">
+							<header class="major" style="margin-bottom: 24px;">
+								<h3 style="color: #2e3842; border-bottom-color: #2e3842;">Interested? Send Us a Message
+								</h3>
 							</header>
+							<style>
+								#three input[type="text"],
+								#three input[type="email"],
+								#three textarea {
+									background-color: #f7f7f7 !important;
+									border: 1px solid #ddd !important;
+									color: #2e3842 !important;
+								}
+
+								#three input::placeholder,
+								#three textarea::placeholder {
+									color: #aaa !important;
+								}
+							</style>
 							<div class="row gtr-uniform">
 								<div class="col-6 col-12-xsmall">
 									<input type="text" name="demo-name" id="demo-name" value="" placeholder="Name" />
