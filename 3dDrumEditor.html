@@ -148,8 +148,36 @@
             transform: scale(1.15);
         }
 
+        .lug-swatch.active {
+            border-color: #ffffff;
+            border-width: 4px;
+            transform: scale(1.15);
+        }
+
+        .hoop-swatch {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 3px solid var(--border);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .hoop-swatch:hover {
+            transform: scale(1.1);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .hoop-swatch.active {
+            border-color: #ffffff;
+            border-width: 4px;
+            transform: scale(1.15);
+        }
+
         .color-swatch.active::after,
-        .lug-swatch.active::after {
+        .lug-swatch.active::after,
+        .hoop-swatch.active::after {
             content: '✓';
             position: absolute;
             top: 50%;
@@ -159,17 +187,6 @@
             font-weight: bold;
             font-size: 20px;
             text-shadow: 0 0 3px rgba(0, 0, 0, 0.8);
-        }
-
-        .lug-swatch:hover {
-            transform: scale(1.1);
-            border-color: rgba(255, 255, 255, 0.5);
-        }
-
-        .lug-swatch.active {
-            border-color: #ffffff;
-            border-width: 4px;
-            transform: scale(1.15);
         }
 
         /* SUMMARY */
@@ -326,12 +343,40 @@
                     </div>
                 </div>
 
-                <div class="section" style="display: none;">
-                    <h2>Hoops</h2>
-                    <div class="options">
-                        <div class="option active">Chrome</div>
-                        <div class="option">Black</div>
-                        <div class="option">Brass</div>
+                <div class="section">
+                    <h2>Hoop Color</h2>
+                    <div class="hoop-color-options"
+                        style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px;">
+                        <div class="hoop-swatch"
+                            style="background-color: #1a1a1a; width: 50px; height: 50px; border-radius: 50%; border: 3px solid #333; cursor: pointer; transition: all 0.3s ease; position: relative;"
+                            data-color="#1a1a1a" title="Black"></div>
+                        <div class="hoop-swatch"
+                            style="background-color: #f5f5f5; width: 50px; height: 50px; border-radius: 50%; border: 3px solid #333; cursor: pointer; transition: all 0.3s ease; position: relative;"
+                            data-color="#f5f5f5" title="White"></div>
+                        <div class="hoop-swatch"
+                            style="background-color: #c41e3a; width: 50px; height: 50px; border-radius: 50%; border: 3px solid #333; cursor: pointer; transition: all 0.3s ease; position: relative;"
+                            data-color="#c41e3a" title="Red"></div>
+                        <div class="hoop-swatch"
+                            style="background-color: #0051ba; width: 50px; height: 50px; border-radius: 50%; border: 3px solid #333; cursor: pointer; transition: all 0.3s ease; position: relative;"
+                            data-color="#0051ba" title="Blue"></div>
+                        <div class="hoop-swatch"
+                            style="background-color: #2d5f3f; width: 50px; height: 50px; border-radius: 50%; border: 3px solid #333; cursor: pointer; transition: all 0.3s ease; position: relative;"
+                            data-color="#2d5f3f" title="Forest Green"></div>
+                        <div class="hoop-swatch"
+                            style="background-color: #663399; width: 50px; height: 50px; border-radius: 50%; border: 3px solid #333; cursor: pointer; transition: all 0.3s ease; position: relative;"
+                            data-color="#663399" title="Purple"></div>
+                        <div class="hoop-swatch"
+                            style="background-color: #8b6f47; width: 50px; height: 50px; border-radius: 50%; border: 3px solid #333; cursor: pointer; transition: all 0.3s ease; position: relative;"
+                            data-color="#8b6f47" title="Natural Wood"></div>
+                        <div class="hoop-swatch"
+                            style="background-color: #ff6600; width: 50px; height: 50px; border-radius: 50%; border: 3px solid #333; cursor: pointer; transition: all 0.3s ease; position: relative;"
+                            data-color="#ff6600" title="Orange"></div>
+                        <div class="hoop-swatch active"
+                            style="background-color: #ffd700; width: 50px; height: 50px; border-radius: 50%; border: 3px solid #333; cursor: pointer; transition: all 0.3s ease; position: relative;"
+                            data-color="#ffd700" title="Gold" data-metalness="0.7" data-roughness="0.4"></div>
+                        <div class="hoop-swatch"
+                            style="background-color: #c0c0c0; width: 50px; height: 50px; border-radius: 50%; border: 3px solid #333; cursor: pointer; transition: all 0.3s ease; position: relative;"
+                            data-color="#c0c0c0" title="Silver" data-metalness="0.7" data-roughness="0.4"></div>
                     </div>
                 </div>
 
@@ -548,99 +593,103 @@
 
         // Load the 3D model
         const loader = new GLTFLoader();
-        let drumModel;
+        let drumModel = new THREE.Group();
+        scene.add(drumModel);
+
+        const drumParts = {
+            shell: null,
+            lugs: null,
+            hoopTop: null,
+            hoopBottom: null,
+            inserts: null,
+            screws: null
+        };
 
         // Generate texture
         const printTexture = createPrintTexture();
 
         const loadingElement = document.getElementById('loading');
-        // Add timestamp to prevent caching
-        const modelUrl = './3dObjects/SnareDrumShell14x5.5.glb?v=' + new Date().getTime();
 
-        console.log('Starting to load 3D model from:', modelUrl);
-        console.log('Canvas size:', canvas.clientWidth, 'x', canvas.clientHeight);
+        const partFiles = [
+            { name: 'shell', url: './3dObjects/StandardSnareGroup/Shell14x55.glb' },
+            { name: 'lugs', url: './3dObjects/StandardSnareGroup/LugsStandardGroup.glb' },
+            { name: 'hoopTop', url: './3dObjects/StandardSnareGroup/HoopTop.glb' },
+            { name: 'hoopBottom', url: './3dObjects/StandardSnareGroup/HoopBottom.glb' },
+            { name: 'inserts', url: './3dObjects/StandardSnareGroup/InsertGroup.glb' },
+            { name: 'screws', url: './3dObjects/StandardSnareGroup/ScrewsGroup.glb' }
+        ];
 
-        loader.load(
-            modelUrl,
-            function (gltf) {
-                drumModel = gltf.scene;
+        let loadedCount = 0;
 
-                console.log('✓ Model loaded successfully!', gltf);
+        partFiles.forEach(file => {
+            const url = file.url + '?v=' + new Date().getTime();
+            loader.load(url, (gltf) => {
+                const model = gltf.scene;
+                drumParts[file.name] = model;
+                drumModel.add(model);
 
-                // Log hierarchy for debugging
-                console.log('--- Model Hierarchy ---');
-                drumModel.traverse((child) => {
-                    console.log(`Node: "${child.name}", Type: ${child.type}, Mesh: ${child.isMesh}, Parent: "${child.parent ? child.parent.name : 'null'}"`);
-
-                    // Shadow setup
+                model.traverse((child) => {
                     if (child.isMesh) {
                         child.castShadow = true;
                         child.receiveShadow = true;
-
-                        // Clone material to ensure unique instances for independent coloring
                         if (child.material) {
                             child.material = child.material.clone();
 
                             // Apply 3D print texture
                             child.material.bumpMap = printTexture;
-                            child.material.bumpScale = 0.005; // Subtle effect
+                            child.material.bumpScale = 0.005;
 
-                            // Adjust texture tiling based on object size if possible, 
-                            // or just use a sensible default. 
-                            // Since UVs might vary, we might need to rely on the model's UV mapping.
-                            // Assuming the model is unwrapped reasonably well.
+                            // Apply stainless steel look to inserts and screws
+                            if (file.name === 'inserts' || file.name === 'screws') {
+                                child.material.color.set(0xcccccc); // Light grey / silver
+                                child.material.metalness = 1.0;
+                                child.material.roughness = 0.2;
+                                child.material.needsUpdate = true;
+                            }
                         }
                     }
                 });
-                console.log('---------------------');
 
-                // Center and scale the model
-                const box = new THREE.Box3().setFromObject(drumModel);
-                const center = box.getCenter(new THREE.Vector3());
-                const size = box.getSize(new THREE.Vector3());
-
-                // Center the model
-                drumModel.position.x = -center.x;
-                drumModel.position.y = -center.y;
-                drumModel.position.z = -center.z;
-
-                // Scale to appropriate size
-                const maxDim = Math.max(size.x, size.y, size.z);
-                const scale = 8 / maxDim;
-                drumModel.scale.setScalar(scale);
-
-                // Rotate model to face the camera (Shell side view)
-                // Integrating user feedback: orient shell surface to user
-                drumModel.rotation.x = Math.PI / 2;
-                drumModel.rotation.y = Math.PI; // Optional: Rotate back to front if needed
-
-                scene.add(drumModel);
-
-                // Hide loading indicator
+                loadedCount++;
                 if (loadingElement) {
-                    loadingElement.style.display = 'none';
+                    loadingElement.textContent = `Loading... ${Math.round((loadedCount / partFiles.length) * 100)}%`;
                 }
 
-                // Set Default Colors: Silver Shell, Gold Lugs
-                updateShellColor('#c0c0c0', 0.7, 0.4);
-                updateLugColor('#ffd700', 0.7, 0.4);
+                if (loadedCount === partFiles.length) {
+                    onAllPartsLoaded();
+                }
+            });
+        });
 
-            },
-            function (xhr) {
-                const percentComplete = (xhr.loaded / xhr.total) * 100;
-                console.log('Loading progress: ' + percentComplete.toFixed(2) + '%');
-                if (loadingElement) {
-                    loadingElement.textContent = `Loading 3D model... ${percentComplete.toFixed(0)}%`;
-                }
-            },
-            function (error) {
-                console.error('✗ Error loading 3D model:', error);
-                if (loadingElement) {
-                    loadingElement.textContent = 'Error loading model. Check console for details.';
-                    loadingElement.style.color = '#ff5555';
-                }
+        function onAllPartsLoaded() {
+            console.log('✓ All drum parts loaded!');
+
+            // Center and scale the group
+            const box = new THREE.Box3().setFromObject(drumModel);
+            const center = box.getCenter(new THREE.Vector3());
+            const size = box.getSize(new THREE.Vector3());
+
+            drumModel.position.x = -center.x;
+            drumModel.position.y = -center.y;
+            drumModel.position.z = -center.z;
+
+            const maxDim = Math.max(size.x, size.y, size.z);
+            const scale = 8 / maxDim;
+            drumModel.scale.setScalar(scale);
+
+            // Rotate model to face the camera (Shell side view)
+            drumModel.rotation.x = Math.PI / 2;
+            drumModel.rotation.y = Math.PI;
+
+            if (loadingElement) {
+                loadingElement.style.display = 'none';
             }
-        );
+
+            // Set Default Colors: Silver Shell, Gold Lugs & Hoops
+            updateShellColor('#c0c0c0', 0.7, 0.4);
+            updateLugColor('#ffd700', 0.7, 0.4);
+            updateHoopColor('#ffd700', 0.7, 0.4);
+        }
 
         // Handle window resize
         function onWindowResize() {
@@ -657,48 +706,43 @@
 
         // Color changing logic
         function updateShellColor(colorHex, metalness = 0.0, roughness = 0.5) {
-            if (!drumModel) return;
-            console.log(`Updating Shell: Color=${colorHex}, Metal=${metalness}, Rough=${roughness}`);
-
+            if (!drumParts.shell) return;
             const color = new THREE.Color(colorHex);
-
-            drumModel.traverse((child) => {
+            drumParts.shell.traverse((child) => {
                 if (child.isMesh) {
-                    const name = child.name.toLowerCase();
-                    const cleanName = name.replace(/\./g, ''); // Handle "Lugs.005" vs "Lugs005"
-
-                    // Logic: Lugs005 is the shell.
-                    if (cleanName.includes('lugs005') || name.includes('shell') || name.includes('body')) {
-                        console.log('Setting Shell Props on:', child.name);
-                        child.material.color.set(color);
-                        child.material.metalness = metalness;
-                        child.material.roughness = roughness;
-                        child.material.needsUpdate = true;
-                    }
+                    child.material.color.set(color);
+                    child.material.metalness = metalness;
+                    child.material.roughness = roughness;
+                    child.material.needsUpdate = true;
                 }
             });
         }
 
         function updateLugColor(colorHex, metalness = 0.0, roughness = 0.5) {
-            if (!drumModel) return;
-            console.log(`Updating Lugs: Color=${colorHex}, Metal=${metalness}, Rough=${roughness}`);
-
+            if (!drumParts.lugs) return;
             const color = new THREE.Color(colorHex);
-
-            drumModel.traverse((child) => {
+            drumParts.lugs.traverse((child) => {
                 if (child.isMesh) {
-                    const name = child.name.toLowerCase();
-                    const cleanName = name.replace(/\./g, '');
+                    child.material.color.set(color);
+                    child.material.metalness = metalness;
+                    child.material.roughness = roughness;
+                    child.material.needsUpdate = true;
+                }
+            });
+        }
 
-                    // Target Lugs.* BUT exclude the shell (Lugs005)
-                    if (cleanName.includes('lugs') && !cleanName.includes('lugs005')) {
-                        console.log('Setting Lug Props on:', child.name);
+        function updateHoopColor(colorHex, metalness = 0.0, roughness = 0.5) {
+            if (!drumParts.hoopTop || !drumParts.hoopBottom) return;
+            const color = new THREE.Color(colorHex);
+            [drumParts.hoopTop, drumParts.hoopBottom].forEach(part => {
+                part.traverse((child) => {
+                    if (child.isMesh) {
                         child.material.color.set(color);
                         child.material.metalness = metalness;
                         child.material.roughness = roughness;
                         child.material.needsUpdate = true;
                     }
-                }
+                });
             });
         }
 
@@ -736,6 +780,21 @@
                 const metalness = parseFloat(swatch.getAttribute('data-metalness')) || 0.0;
                 const roughness = parseFloat(swatch.getAttribute('data-roughness')) || 0.5;
                 updateLugColor(color, metalness, roughness);
+            }
+
+            // Hoop Color Logic
+            if (e.target.classList.contains('hoop-swatch') || e.target.closest('.hoop-swatch')) {
+                const swatch = e.target.classList.contains('hoop-swatch') ? e.target : e.target.closest('.hoop-swatch');
+
+                // UI update
+                document.querySelectorAll('.hoop-swatch').forEach(s => s.classList.remove('active'));
+                swatch.classList.add('active');
+
+                // Model Update
+                const color = swatch.getAttribute('data-color');
+                const metalness = parseFloat(swatch.getAttribute('data-metalness')) || 0.0;
+                const roughness = parseFloat(swatch.getAttribute('data-roughness')) || 0.5;
+                updateHoopColor(color, metalness, roughness);
             }
 
             // Background Color Logic
