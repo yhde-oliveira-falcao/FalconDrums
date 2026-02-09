@@ -116,16 +116,16 @@
         .hoop-color-options,
         .hoop-bottom-color-options {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 12px;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 8px;
         }
 
         .color-swatch,
         .lug-swatch,
         .hoop-swatch,
         .hoop-bottom-swatch {
-            width: 50px;
-            height: 50px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             border: 3px solid var(--border);
             cursor: pointer;
@@ -287,61 +287,95 @@
                 <div class="subtitle">14″ × 6.5″ Snare Drum</div>
 
                 <div class="section">
-                    <h2>Shell Color</h2>
+                    <div style="display: flex; align-items: baseline; gap: 8px; margin-bottom: 12px;">
+                        <h2 style="margin-bottom: 0;">Shell Color</h2>
+                        <span id="shell-color-name"
+                            style="font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px;">Silver</span>
+                    </div>
                     <div class="color-options">
-                        <div class="color-swatch" style="background-color: #1a1a1a;" data-color="#1a1a1a" title="Black">
-                        </div>
+                        <!-- Metallic Group -->
+                        <div class="color-swatch active" style="background-color: #c0c0c0;" data-color="#c0c0c0"
+                            title="Silver" data-metalness="0.7" data-roughness="0.4"></div>
+                        <div class="color-swatch" style="background-color: #ffd700;" data-color="#ffd700" title="Gold"
+                            data-metalness="0.7" data-roughness="0.4"></div>
+                        <div class="color-swatch" style="background-color: #2ecc71;" data-color="#2ecc71"
+                            title="Metallic Green" data-metalness="0.8" data-roughness="0.3"></div>
+                        <div class="color-swatch" style="background-color: #7b2cbf;" data-color="#7b2cbf"
+                            title="Metallic Purple" data-metalness="0.8" data-roughness="0.3"></div>
+                        <div class="color-swatch" style="background-color: #918151;" data-color="#918151"
+                            title="Metallic Khaki" data-metalness="0.7" data-roughness="0.4"></div>
+
+                        <!-- Normal Group -->
                         <div class="color-swatch" style="background-color: #f5f5f5;" data-color="#f5f5f5" title="White">
                         </div>
+                        <div class="color-swatch" style="background-color: #ffb6c1;" data-color="#ffb6c1"
+                            title="Light Pink" data-metalness="0.4" data-roughness="0.3"></div>
                         <div class="color-swatch" style="background-color: #c41e3a;" data-color="#c41e3a" title="Red">
                         </div>
-                        <div class="color-swatch" style="background-color: #0051ba;" data-color="#0051ba" title="Blue">
-                        </div>
+                        <div class="color-swatch" style="background-color: #ff6600;" data-color="#ff6600"
+                            title="Orange"></div>
                         <div class="color-swatch" style="background-color: #2d5f3f;" data-color="#2d5f3f"
                             title="Forest Green"></div>
+                        <div class="color-swatch" style="background-color: #0051ba;" data-color="#0051ba" title="Blue">
+                        </div>
                         <div class="color-swatch" style="background-color: #663399;" data-color="#663399"
                             title="Purple"></div>
                         <div class="color-swatch" style="background-color: #8b6f47;" data-color="#8b6f47"
                             title="Natural Wood"></div>
-                        <div class="color-swatch" style="background-color: #ff6600;" data-color="#ff6600"
-                            title="Orange"></div>
-                        <div class="color-swatch" style="background-color: #ffd700;" data-color="#ffd700" title="Gold"
-                            data-metalness="0.7" data-roughness="0.4"></div>
-                        <div class="color-swatch active" style="background-color: #c0c0c0;" data-color="#c0c0c0"
-                            title="Silver" data-metalness="0.7" data-roughness="0.4"></div>
+                        <div class="color-swatch" style="background-color: #1a1a1a;" data-color="#1a1a1a" title="Black">
+                        </div>
                     </div>
                 </div>
 
                 <div class="section">
-                    <h2>Lug Color</h2>
+                    <div style="display: flex; align-items: baseline; gap: 8px; margin-bottom: 12px;">
+                        <h2 style="margin-bottom: 0;">Lug Color</h2>
+                        <span id="lug-color-name"
+                            style="font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px;">Gold</span>
+                    </div>
                     <div class="lug-color-options">
-                        <div class="lug-swatch" style="background-color: #1a1a1a;" data-color="#1a1a1a" title="Black">
-                        </div>
+                        <!-- Metallic Group -->
+                        <div class="lug-swatch" style="background-color: #c0c0c0;" data-color="#c0c0c0" title="Silver"
+                            data-metalness="0.7" data-roughness="0.4"></div>
+                        <div class="lug-swatch active" style="background-color: #ffd700;" data-color="#ffd700"
+                            title="Gold" data-metalness="0.7" data-roughness="0.4"></div>
+                        <div class="lug-swatch" style="background-color: #2ecc71;" data-color="#2ecc71"
+                            title="Metallic Green" data-metalness="0.8" data-roughness="0.3"></div>
+                        <div class="lug-swatch" style="background-color: #7b2cbf;" data-color="#7b2cbf"
+                            title="Metallic Purple" data-metalness="0.8" data-roughness="0.3"></div>
+                        <div class="lug-swatch" style="background-color: #918151;" data-color="#918151"
+                            title="Metallic Khaki" data-metalness="0.7" data-roughness="0.4"></div>
+
+                        <!-- Normal Group -->
                         <div class="lug-swatch" style="background-color: #f5f5f5;" data-color="#f5f5f5" title="White">
                         </div>
+                        <div class="lug-swatch" style="background-color: #ffb6c1;" data-color="#ffb6c1"
+                            title="Light Pink" data-metalness="0.4" data-roughness="0.3"></div>
                         <div class="lug-swatch" style="background-color: #c41e3a;" data-color="#c41e3a" title="Red">
                         </div>
-                        <div class="lug-swatch" style="background-color: #0051ba;" data-color="#0051ba" title="Blue">
+                        <div class="lug-swatch" style="background-color: #ff6600;" data-color="#ff6600" title="Orange">
                         </div>
                         <div class="lug-swatch" style="background-color: #2d5f3f;" data-color="#2d5f3f"
                             title="Forest Green"></div>
+                        <div class="lug-swatch" style="background-color: #0051ba;" data-color="#0051ba" title="Blue">
+                        </div>
                         <div class="lug-swatch" style="background-color: #663399;" data-color="#663399" title="Purple">
                         </div>
                         <div class="lug-swatch" style="background-color: #8b6f47;" data-color="#8b6f47"
                             title="Natural Wood"></div>
-                        <div class="lug-swatch" style="background-color: #ff6600;" data-color="#ff6600" title="Orange">
+                        <div class="lug-swatch" style="background-color: #1a1a1a;" data-color="#1a1a1a" title="Black">
                         </div>
-                        <div class="lug-swatch active" style="background-color: #ffd700;" data-color="#ffd700"
-                            title="Gold" data-metalness="0.7" data-roughness="0.4"></div>
-                        <div class="lug-swatch" style="background-color: #c0c0c0;" data-color="#c0c0c0" title="Silver"
-                            data-metalness="0.7" data-roughness="0.4"></div>
                     </div>
                 </div>
 
                 <div class="section">
                     <div
                         style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; height: 24px;">
-                        <h2 id="hoop-top-label" style="margin: 0; line-height: 1;">Hoop Color</h2>
+                        <div style="display: flex; align-items: baseline; gap: 8px;">
+                            <h2 id="hoop-top-label" style="margin: 0; line-height: 1;">Hoop Color</h2>
+                            <span id="hoop-color-name"
+                                style="font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px;">Gold</span>
+                        </div>
                         <div style="display: flex; align-items: center; gap: 10px;">
                             <span
                                 style="font-size: 14px; letter-spacing: 1px; text-transform: uppercase; color: #ffffff; line-height: 1; cursor: pointer;">Different</span>
@@ -352,52 +386,78 @@
                         </div>
                     </div>
                     <div class="hoop-color-options">
-                        <div class="hoop-swatch" style="background-color: #1a1a1a;" data-color="#1a1a1a" title="Black">
-                        </div>
+                        <!-- Metallic Group -->
+                        <div class="hoop-swatch" style="background-color: #c0c0c0;" data-color="#c0c0c0" title="Silver"
+                            data-metalness="0.7" data-roughness="0.4"></div>
+                        <div class="hoop-swatch active" style="background-color: #ffd700;" data-color="#ffd700"
+                            title="Gold" data-metalness="0.7" data-roughness="0.4"></div>
+                        <div class="hoop-swatch" style="background-color: #2ecc71;" data-color="#2ecc71"
+                            title="Metallic Green" data-metalness="0.8" data-roughness="0.3"></div>
+                        <div class="hoop-swatch" style="background-color: #7b2cbf;" data-color="#7b2cbf"
+                            title="Metallic Purple" data-metalness="0.8" data-roughness="0.3"></div>
+                        <div class="hoop-swatch" style="background-color: #918151;" data-color="#918151"
+                            title="Metallic Khaki" data-metalness="0.7" data-roughness="0.4"></div>
+
+                        <!-- Normal Group -->
                         <div class="hoop-swatch" style="background-color: #f5f5f5;" data-color="#f5f5f5" title="White">
                         </div>
+                        <div class="hoop-swatch" style="background-color: #ffb6c1;" data-color="#ffb6c1"
+                            title="Light Pink" data-metalness="0.4" data-roughness="0.3"></div>
                         <div class="hoop-swatch" style="background-color: #c41e3a;" data-color="#c41e3a" title="Red">
                         </div>
-                        <div class="hoop-swatch" style="background-color: #0051ba;" data-color="#0051ba" title="Blue">
+                        <div class="hoop-swatch" style="background-color: #ff6600;" data-color="#ff6600" title="Orange">
                         </div>
                         <div class="hoop-swatch" style="background-color: #2d5f3f;" data-color="#2d5f3f"
                             title="Forest Green"></div>
+                        <div class="hoop-swatch" style="background-color: #0051ba;" data-color="#0051ba" title="Blue">
+                        </div>
                         <div class="hoop-swatch" style="background-color: #663399;" data-color="#663399" title="Purple">
                         </div>
                         <div class="hoop-swatch" style="background-color: #8b6f47;" data-color="#8b6f47"
                             title="Natural Wood"></div>
-                        <div class="hoop-swatch" style="background-color: #ff6600;" data-color="#ff6600" title="Orange">
+                        <div class="hoop-swatch" style="background-color: #1a1a1a;" data-color="#1a1a1a" title="Black">
                         </div>
-                        <div class="hoop-swatch active" style="background-color: #ffd700;" data-color="#ffd700"
-                            title="Gold" data-metalness="0.7" data-roughness="0.4"></div>
-                        <div class="hoop-swatch" style="background-color: #c0c0c0;" data-color="#c0c0c0" title="Silver"
-                            data-metalness="0.7" data-roughness="0.4"></div>
                     </div>
                 </div>
 
                 <div class="section" id="bottom-hoop-section" style="display: none;">
-                    <h2>Bottom Hoop Color</h2>
+                    <div style="display: flex; align-items: baseline; gap: 8px; margin-bottom: 12px;">
+                        <h2 style="margin-bottom: 0;">Bottom Hoop Color</h2>
+                        <span id="hoop-bottom-color-name"
+                            style="font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px;">Gold</span>
+                    </div>
                     <div class="hoop-bottom-color-options">
-                        <div class="hoop-bottom-swatch" style="background-color: #1a1a1a;" data-color="#1a1a1a"
-                            title="Black"></div>
+                        <!-- Metallic Group -->
+                        <div class="hoop-bottom-swatch" style="background-color: #c0c0c0;" data-color="#c0c0c0"
+                            title="Silver" data-metalness="0.7" data-roughness="0.4"></div>
+                        <div class="hoop-bottom-swatch active" style="background-color: #ffd700;" data-color="#ffd700"
+                            title="Gold" data-metalness="0.7" data-roughness="0.4"></div>
+                        <div class="hoop-bottom-swatch" style="background-color: #2ecc71;" data-color="#2ecc71"
+                            title="Metallic Green" data-metalness="0.8" data-roughness="0.3"></div>
+                        <div class="hoop-bottom-swatch" style="background-color: #7b2cbf;" data-color="#7b2cbf"
+                            title="Metallic Purple" data-metalness="0.8" data-roughness="0.3"></div>
+                        <div class="hoop-bottom-swatch" style="background-color: #918151;" data-color="#918151"
+                            title="Metallic Khaki" data-metalness="0.7" data-roughness="0.4"></div>
+
+                        <!-- Normal Group -->
                         <div class="hoop-bottom-swatch" style="background-color: #f5f5f5;" data-color="#f5f5f5"
                             title="White"></div>
+                        <div class="hoop-bottom-swatch" style="background-color: #ffb6c1;" data-color="#ffb6c1"
+                            title="Light Pink" data-metalness="0.4" data-roughness="0.3"></div>
                         <div class="hoop-bottom-swatch" style="background-color: #c41e3a;" data-color="#c41e3a"
                             title="Red"></div>
-                        <div class="hoop-bottom-swatch" style="background-color: #0051ba;" data-color="#0051ba"
-                            title="Blue"></div>
+                        <div class="hoop-bottom-swatch" style="background-color: #ff6600;" data-color="#ff6600"
+                            title="Orange"></div>
                         <div class="hoop-bottom-swatch" style="background-color: #2d5f3f;" data-color="#2d5f3f"
                             title="Forest Green"></div>
+                        <div class="hoop-bottom-swatch" style="background-color: #0051ba;" data-color="#0051ba"
+                            title="Blue"></div>
                         <div class="hoop-bottom-swatch" style="background-color: #663399;" data-color="#663399"
                             title="Purple"></div>
                         <div class="hoop-bottom-swatch" style="background-color: #8b6f47;" data-color="#8b6f47"
                             title="Natural Wood"></div>
-                        <div class="hoop-bottom-swatch" style="background-color: #ff6600;" data-color="#ff6600"
-                            title="Orange"></div>
-                        <div class="hoop-bottom-swatch active" style="background-color: #ffd700;" data-color="#ffd700"
-                            title="Gold" data-metalness="0.7" data-roughness="0.4"></div>
-                        <div class="hoop-bottom-swatch" style="background-color: #c0c0c0;" data-color="#c0c0c0"
-                            title="Silver" data-metalness="0.7" data-roughness="0.4"></div>
+                        <div class="hoop-bottom-swatch" style="background-color: #1a1a1a;" data-color="#1a1a1a"
+                            title="Black"></div>
                     </div>
                 </div>
 
@@ -651,18 +711,21 @@
                 const s = e.target.closest('.color-swatch') || e.target;
                 document.querySelectorAll('.color-swatch').forEach(el => el.classList.remove('active'));
                 s.classList.add('active');
+                document.getElementById('shell-color-name').textContent = s.title;
                 updateShellColor(s.dataset.color, parseFloat(s.dataset.metalness) || 0, parseFloat(s.dataset.roughness) || 0.5);
             }
             if (e.target.classList.contains('lug-swatch') || e.target.closest('.lug-swatch')) {
                 const s = e.target.closest('.lug-swatch') || e.target;
                 document.querySelectorAll('.lug-swatch').forEach(el => el.classList.remove('active'));
                 s.classList.add('active');
+                document.getElementById('lug-color-name').textContent = s.title;
                 updateLugColor(s.dataset.color, parseFloat(s.dataset.metalness) || 0, parseFloat(s.dataset.roughness) || 0.5);
             }
             if (e.target.classList.contains('hoop-swatch') || e.target.closest('.hoop-swatch')) {
                 const s = e.target.closest('.hoop-swatch') || e.target;
                 document.querySelectorAll('.hoop-swatch').forEach(el => el.classList.remove('active'));
                 s.classList.add('active');
+                document.getElementById('hoop-color-name').textContent = s.title;
                 const both = !hoopToggle.checked;
                 updateHoopColor(s.dataset.color, parseFloat(s.dataset.metalness) || 0, parseFloat(s.dataset.roughness) || 0.5, both, 'top');
             }
@@ -670,6 +733,7 @@
                 const s = e.target.closest('.hoop-bottom-swatch') || e.target;
                 document.querySelectorAll('.hoop-bottom-swatch').forEach(el => el.classList.remove('active'));
                 s.classList.add('active');
+                document.getElementById('hoop-bottom-color-name').textContent = s.title;
                 updateHoopColor(s.dataset.color, parseFloat(s.dataset.metalness) || 0, parseFloat(s.dataset.roughness) || 0.5, false, 'bottom');
             }
             if (e.target.classList.contains('bg-swatch') || e.target.closest('.bg-swatch')) {
