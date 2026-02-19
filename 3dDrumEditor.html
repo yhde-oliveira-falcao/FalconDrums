@@ -418,6 +418,15 @@
                         <div class="hoop-swatch" style="background-color: #1a1a1a;" data-color="#1a1a1a" title="Black">
                         </div>
                     </div>
+
+                    <div
+                        style="margin-top: 16px; padding-top: 16px; border-top: 1px solid #333; display: flex; align-items: center; justify-content: space-between;">
+                        <span style="font-size: 14px; color: var(--text);">Diecast Hoops</span>
+                        <label class="switch" style="transform: scale(0.8);">
+                            <input type="checkbox" id="diecast-hoop-toggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
                 </div>
 
                 <div class="section" id="bottom-hoop-section" style="display: none;">
@@ -551,10 +560,10 @@
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         renderer.outputColorSpace = THREE.SRGBColorSpace;
         renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        renderer.toneMappingExposure = 1.0;
+        renderer.toneMappingExposure = 1.8;
 
         const pmremGenerator = new THREE.PMREMGenerator(renderer);
-        scene.environment = pmremGenerator.fromScene(new RoomEnvironment(), 0.04).texture;
+        scene.environment = pmremGenerator.fromScene(new RoomEnvironment(), 0.1).texture;
 
         const controls = new OrbitControls(camera, canvas);
         controls.enableDamping = true;
@@ -578,9 +587,18 @@
         rimLight.position.set(0, 5, -15);
         scene.add(rimLight);
 
-        const hemiLight = new THREE.HemisphereLight(0xffffff, 0x000000, 0.3);
+        const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.5);
         hemiLight.position.set(0, 20, 0);
         scene.add(hemiLight);
+
+        // Extra specular lights to create stainless steel hot-spot streaks
+        const specLight1 = new THREE.PointLight(0xffffff, 3.5);
+        specLight1.position.set(5, 15, 8);
+        scene.add(specLight1);
+
+        const specLight2 = new THREE.PointLight(0xffffff, 2.5);
+        specLight2.position.set(-8, 12, -5);
+        scene.add(specLight2);
 
         function createPrintTexture() {
             const width = 512;
@@ -619,7 +637,9 @@
             { name: 'hoopTop', url: './3dObjects/StandardSnareGroup/HoopTop.glb' },
             { name: 'hoopBottom', url: './3dObjects/StandardSnareGroup/HoopBottom.glb' },
             { name: 'inserts', url: './3dObjects/StandardSnareGroup/InsertGroup.glb' },
-            { name: 'screws', url: './3dObjects/StandardSnareGroup/ScrewsGroup.glb' }
+            { name: 'screws', url: './3dObjects/StandardSnareGroup/ScrewsGroup.glb' },
+            { name: 'diecastHoopTop', url: './3dObjects/StandardSnareGroup/DieCastHoopTop.glb' },
+            { name: 'diecastHoopBottom', url: './3dObjects/StandardSnareGroup/DieCastHoopBottom.glb' }
         ];
 
         let loadedCount = 0;
@@ -643,11 +663,35 @@
                                 bumpMap: printTexture,
                                 bumpScale: 0.02
                             });
-                            if (file.name === 'inserts' || file.name === 'screws') {
-                                child.material.color.set(0xcccccc);
+                            if (file.name === 'inserts') {
+                                child.material.color.set(0xe2e2e2); // Neutral steel grey
                                 child.material.metalness = 1.0;
-                                child.material.roughness = 0.1;
+                                child.material.roughness = 0.0;
                                 child.material.clearcoat = 1.0;
+                                child.material.clearcoatRoughness = 0.0;
+                                child.material.envMapIntensity = 5.0;
+                                child.material.bumpMap = null;
+                                child.material.bumpScale = 0;
+                            } else if (file.name === 'screws') {
+                                // Mirror-chrome stainless steel — matches diecast hoops
+                                child.material.color.set(0xe2e2e2);
+                                child.material.metalness = 1.0;
+                                child.material.roughness = 0.0;
+                                child.material.clearcoat = 1.0;
+                                child.material.clearcoatRoughness = 0.0;
+                                child.material.envMapIntensity = 5.0;
+                                child.material.bumpMap = null;
+                                child.material.bumpScale = 0;
+                            } else if (file.name.includes('diecast')) {
+                                // Polished mirror stainless steel
+                                child.material.color.set(0xe2e2e2);
+                                child.material.metalness = 1.0;
+                                child.material.roughness = 0.0;
+                                child.material.clearcoat = 1.0;
+                                child.material.clearcoatRoughness = 0.0;
+                                child.material.envMapIntensity = 5.0;
+                                child.material.bumpMap = null;
+                                child.material.bumpScale = 0;
                             }
                         }
                     }
@@ -665,6 +709,11 @@
             drumModel.position.set(-center.x, -center.y, -center.z);
             drumModel.scale.setScalar(9 / Math.max(size.x, size.y, size.z));
             drumModel.rotation.set(Math.PI / 2, Math.PI, 0);
+
+            // Hide diecast hoops initially
+            if (drumParts.diecastHoopTop) drumParts.diecastHoopTop.visible = false;
+            if (drumParts.diecastHoopBottom) drumParts.diecastHoopBottom.visible = false;
+
             if (loadingElement) loadingElement.style.display = 'none';
             updateShellColor('#c0c0c0', 0.7, 0.4);
             updateLugColor('#ffd700', 0.7, 0.4);
@@ -694,6 +743,30 @@
         const hoopToggle = document.getElementById('hoop-mode-toggle');
         const bottomHoopSection = document.getElementById('bottom-hoop-section');
         const hoopTopLabel = document.getElementById('hoop-top-label');
+        const diecastToggle = document.getElementById('diecast-hoop-toggle');
+
+        diecastToggle.addEventListener('change', (e) => {
+            const isDiecast = e.target.checked;
+
+            // Toggle visibility
+            if (drumParts.hoopTop) drumParts.hoopTop.visible = !isDiecast;
+            if (drumParts.hoopBottom) drumParts.hoopBottom.visible = !isDiecast;
+
+            if (drumParts.diecastHoopTop) drumParts.diecastHoopTop.visible = isDiecast;
+            if (drumParts.diecastHoopBottom) drumParts.diecastHoopBottom.visible = isDiecast;
+
+            // Disable standard hoop color options if diecast is selected
+            const hoopColorOptions = document.querySelector('.hoop-color-options');
+            if (hoopColorOptions) {
+                hoopColorOptions.style.opacity = isDiecast ? '0.5' : '1';
+                hoopColorOptions.style.pointerEvents = isDiecast ? 'none' : 'auto';
+            }
+            const bottomHoopOptions = document.querySelector('.hoop-bottom-color-options');
+            if (bottomHoopOptions) {
+                bottomHoopOptions.style.opacity = isDiecast ? '0.5' : '1';
+                bottomHoopOptions.style.pointerEvents = isDiecast ? 'none' : 'auto';
+            }
+        });
 
         hoopToggle.addEventListener('change', (e) => {
             const isDifferent = e.target.checked;
