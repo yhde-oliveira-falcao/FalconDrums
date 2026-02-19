@@ -419,11 +419,22 @@
                         </div>
                     </div>
 
-                    <div
+                    <!-- Combined toggle: shown when Different=OFF -->
+                    <div id="diecast-both-row"
                         style="margin-top: 16px; padding-top: 16px; border-top: 1px solid #333; display: flex; align-items: center; justify-content: space-between;">
                         <span style="font-size: 14px; color: var(--text);">Diecast Hoops</span>
                         <label class="switch" style="transform: scale(0.8);">
                             <input type="checkbox" id="diecast-hoop-toggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <!-- Per-hoop top toggle: shown when Different=ON -->
+                    <div id="diecast-top-row"
+                        style="margin-top: 16px; padding-top: 16px; border-top: 1px solid #333; display: none; align-items: center; justify-content: space-between;">
+                        <span style="font-size: 14px; color: var(--text);">Diecast Top Hoop</span>
+                        <label class="switch" style="transform: scale(0.8);">
+                            <input type="checkbox" id="diecast-top-toggle">
                             <span class="slider"></span>
                         </label>
                     </div>
@@ -467,6 +478,16 @@
                             title="Natural Wood"></div>
                         <div class="hoop-bottom-swatch" style="background-color: #1a1a1a;" data-color="#1a1a1a"
                             title="Black"></div>
+                    </div>
+
+                    <!-- Per-hoop bottom toggle: shown when Different=ON -->
+                    <div id="diecast-bottom-row"
+                        style="margin-top: 16px; padding-top: 16px; border-top: 1px solid #333; display: flex; align-items: center; justify-content: space-between;">
+                        <span style="font-size: 14px; color: var(--text);">Diecast Bottom Hoop</span>
+                        <label class="switch" style="transform: scale(0.8);">
+                            <input type="checkbox" id="diecast-bottom-toggle">
+                            <span class="slider"></span>
+                        </label>
                     </div>
                 </div>
 
@@ -543,7 +564,6 @@
         import * as THREE from 'three';
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
         import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-        import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
         const canvas = document.getElementById('viewer3d');
         const scene = new THREE.Scene();
@@ -559,11 +579,47 @@
         renderer.shadowMap.enabled = true;
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         renderer.outputColorSpace = THREE.SRGBColorSpace;
-        renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        renderer.toneMappingExposure = 1.8;
+        renderer.toneMapping = THREE.LinearToneMapping;
+        renderer.toneMappingExposure = 2.0;
 
+        // High-contrast studio environment — essential for chrome/stainless to look metallic
+        // (RoomEnvironment is too uniform; chrome needs bright spots + dark voids)
         const pmremGenerator = new THREE.PMREMGenerator(renderer);
-        scene.environment = pmremGenerator.fromScene(new RoomEnvironment(), 0.1).texture;
+        pmremGenerator.compileEquirectangularShader();
+
+        function buildStudioEnv() {
+            const envScene = new THREE.Scene();
+            envScene.background = new THREE.Color(0x080808); // near-black background
+
+            // Top softbox — creates the wide bright band across the top of the drum
+            const top = new THREE.DirectionalLight(0xffffff, 20);
+            top.position.set(0, 10, 2);
+            envScene.add(top);
+
+            // Left panel — sharp bright streak on the left side
+            const left = new THREE.DirectionalLight(0xffffff, 18);
+            left.position.set(-8, 4, 4);
+            envScene.add(left);
+
+            // Right panel
+            const right = new THREE.DirectionalLight(0xffffff, 14);
+            right.position.set(8, 4, 4);
+            envScene.add(right);
+
+            // Back rim — separates chrome from background
+            const back = new THREE.DirectionalLight(0xffffff, 8);
+            back.position.set(0, 3, -10);
+            envScene.add(back);
+
+            // Very dim floor fill (keeps it from being totally black underneath)
+            const floor = new THREE.DirectionalLight(0x8899aa, 3);
+            floor.position.set(0, -8, 0);
+            envScene.add(floor);
+
+            return pmremGenerator.fromScene(envScene, 0.0).texture;
+        }
+
+        scene.environment = buildStudioEnv();
 
         const controls = new OrbitControls(camera, canvas);
         controls.enableDamping = true;
@@ -592,13 +648,18 @@
         scene.add(hemiLight);
 
         // Extra specular lights to create stainless steel hot-spot streaks
-        const specLight1 = new THREE.PointLight(0xffffff, 3.5);
+        const specLight1 = new THREE.PointLight(0xffffff, 4.0);
         specLight1.position.set(5, 15, 8);
         scene.add(specLight1);
 
-        const specLight2 = new THREE.PointLight(0xffffff, 2.5);
+        const specLight2 = new THREE.PointLight(0xffffff, 3.0);
         specLight2.position.set(-8, 12, -5);
         scene.add(specLight2);
+
+        // Narrow spot for that sharp stainless-steel highlight streak
+        const metalSpot = new THREE.SpotLight(0xffffff, 6.0, 80, Math.PI / 10, 0.05);
+        metalSpot.position.set(2, 18, 6);
+        scene.add(metalSpot);
 
         function createPrintTexture() {
             const width = 512;
@@ -664,32 +725,32 @@
                                 bumpScale: 0.02
                             });
                             if (file.name === 'inserts') {
-                                child.material.color.set(0xe2e2e2); // Neutral steel grey
+                                child.material.color.set(0x909090); // Steel grey — reflections provide brightness
                                 child.material.metalness = 1.0;
                                 child.material.roughness = 0.0;
                                 child.material.clearcoat = 1.0;
                                 child.material.clearcoatRoughness = 0.0;
-                                child.material.envMapIntensity = 5.0;
+                                child.material.envMapIntensity = 6.0;
                                 child.material.bumpMap = null;
                                 child.material.bumpScale = 0;
                             } else if (file.name === 'screws') {
-                                // Mirror-chrome stainless steel — matches diecast hoops
-                                child.material.color.set(0xe2e2e2);
+                                // Mirror stainless — same as diecast hoops
+                                child.material.color.set(0x909090);
                                 child.material.metalness = 1.0;
                                 child.material.roughness = 0.0;
                                 child.material.clearcoat = 1.0;
                                 child.material.clearcoatRoughness = 0.0;
-                                child.material.envMapIntensity = 5.0;
+                                child.material.envMapIntensity = 6.0;
                                 child.material.bumpMap = null;
                                 child.material.bumpScale = 0;
                             } else if (file.name.includes('diecast')) {
                                 // Polished mirror stainless steel
-                                child.material.color.set(0xe2e2e2);
+                                child.material.color.set(0x909090);
                                 child.material.metalness = 1.0;
                                 child.material.roughness = 0.0;
                                 child.material.clearcoat = 1.0;
                                 child.material.clearcoatRoughness = 0.0;
-                                child.material.envMapIntensity = 5.0;
+                                child.material.envMapIntensity = 6.0;
                                 child.material.bumpMap = null;
                                 child.material.bumpScale = 0;
                             }
@@ -743,29 +804,67 @@
         const hoopToggle = document.getElementById('hoop-mode-toggle');
         const bottomHoopSection = document.getElementById('bottom-hoop-section');
         const hoopTopLabel = document.getElementById('hoop-top-label');
-        const diecastToggle = document.getElementById('diecast-hoop-toggle');
+        const diecastToggle = document.getElementById('diecast-hoop-toggle');    // combined
+        const diecastTopToggle = document.getElementById('diecast-top-toggle');     // top only
+        const diecastBotToggle = document.getElementById('diecast-bottom-toggle');  // bottom only
+        const diecastBothRow = document.getElementById('diecast-both-row');
+        const diecastTopRow = document.getElementById('diecast-top-row');
+        const diecastBotRow = document.getElementById('diecast-bottom-row');
 
+        // Per-hoop state
+        let topDiecast = false;
+        let botDiecast = false;
+
+        function applyDiecastMaterial(part) {
+            if (!part) return;
+            part.traverse(c => {
+                if (c.isMesh) {
+                    c.material.color.set(0xe2e2e2);
+                    c.material.metalness = 1.0;
+                    c.material.roughness = 0.0;
+                    c.material.clearcoat = 1.0;
+                    c.material.clearcoatRoughness = 0.0;
+                    c.material.envMapIntensity = 5.0;
+                }
+            });
+        }
+
+        function syncHoopVisibility() {
+            if (drumParts.hoopTop) drumParts.hoopTop.visible = !topDiecast;
+            if (drumParts.diecastHoopTop) drumParts.diecastHoopTop.visible = topDiecast;
+            if (drumParts.hoopBottom) drumParts.hoopBottom.visible = !botDiecast;
+            if (drumParts.diecastHoopBottom) drumParts.diecastHoopBottom.visible = botDiecast;
+        }
+
+        function setColorOptionsDisabled(selector, disabled) {
+            const el = document.querySelector(selector);
+            if (el) {
+                el.style.opacity = disabled ? '0.5' : '1';
+                el.style.pointerEvents = disabled ? 'none' : 'auto';
+            }
+        }
+
+        // Combined toggle (both hoops, shown when Different=OFF)
         diecastToggle.addEventListener('change', (e) => {
-            const isDiecast = e.target.checked;
+            topDiecast = e.target.checked;
+            botDiecast = e.target.checked;
+            syncHoopVisibility();
+            setColorOptionsDisabled('.hoop-color-options', topDiecast);
+            setColorOptionsDisabled('.hoop-bottom-color-options', botDiecast);
+        });
 
-            // Toggle visibility
-            if (drumParts.hoopTop) drumParts.hoopTop.visible = !isDiecast;
-            if (drumParts.hoopBottom) drumParts.hoopBottom.visible = !isDiecast;
+        // Top hoop individual toggle (shown when Different=ON)
+        diecastTopToggle.addEventListener('change', (e) => {
+            topDiecast = e.target.checked;
+            syncHoopVisibility();
+            setColorOptionsDisabled('.hoop-color-options', topDiecast);
+        });
 
-            if (drumParts.diecastHoopTop) drumParts.diecastHoopTop.visible = isDiecast;
-            if (drumParts.diecastHoopBottom) drumParts.diecastHoopBottom.visible = isDiecast;
-
-            // Disable standard hoop color options if diecast is selected
-            const hoopColorOptions = document.querySelector('.hoop-color-options');
-            if (hoopColorOptions) {
-                hoopColorOptions.style.opacity = isDiecast ? '0.5' : '1';
-                hoopColorOptions.style.pointerEvents = isDiecast ? 'none' : 'auto';
-            }
-            const bottomHoopOptions = document.querySelector('.hoop-bottom-color-options');
-            if (bottomHoopOptions) {
-                bottomHoopOptions.style.opacity = isDiecast ? '0.5' : '1';
-                bottomHoopOptions.style.pointerEvents = isDiecast ? 'none' : 'auto';
-            }
+        // Bottom hoop individual toggle (shown when Different=ON)
+        diecastBotToggle.addEventListener('change', (e) => {
+            botDiecast = e.target.checked;
+            syncHoopVisibility();
+            setColorOptionsDisabled('.hoop-bottom-color-options', botDiecast);
         });
 
         hoopToggle.addEventListener('change', (e) => {
@@ -773,9 +872,30 @@
             bottomHoopSection.style.display = isDifferent ? 'block' : 'none';
             hoopTopLabel.textContent = isDifferent ? 'Top Hoop Color' : 'Hoop Color';
 
-            if (!isDifferent) {
+            if (isDifferent) {
+                // Show per-hoop toggles, hide combined
+                diecastBothRow.style.display = 'none';
+                diecastTopRow.style.display = 'flex';
+                // diecastBotRow lives in bottom-hoop-section, already visible
+                // Sync individual toggles to current combined state
+                diecastTopToggle.checked = topDiecast;
+                diecastBotToggle.checked = botDiecast;
+            } else {
+                // Show combined toggle, hide per-hoop
+                diecastBothRow.style.display = 'flex';
+                diecastTopRow.style.display = 'none';
+                // Sync combined toggle: ON only if both were diecast
+                const bothOn = topDiecast && botDiecast;
+                diecastToggle.checked = bothOn;
+                topDiecast = bothOn;
+                botDiecast = bothOn;
+                syncHoopVisibility();
+                setColorOptionsDisabled('.hoop-color-options', topDiecast);
+                setColorOptionsDisabled('.hoop-bottom-color-options', botDiecast);
+
+                // Sync bottom hoop color to top when collapsing
                 const activeTop = document.querySelector('.hoop-swatch.active');
-                if (activeTop) {
+                if (activeTop && !topDiecast) {
                     const color = activeTop.getAttribute('data-color');
                     const metal = parseFloat(activeTop.getAttribute('data-metalness')) || 0;
                     const rough = parseFloat(activeTop.getAttribute('data-roughness')) || 0.5;
