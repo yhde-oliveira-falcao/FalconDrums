@@ -62,14 +62,33 @@
 		</section>
 
 		<!-- One -->
-		<section id="one" class="wrapper style1 special">
-			<div class="inner">
+		<section id="one" class="wrapper style1 special"
+			style="position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; min-height: 60vh;">
+			<!-- Background YouTube Video (Looping, Muted) -->
+			<div class="video-background" id="bg-video-container"
+				style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none;">
+				<iframe id="bg-youtube-player"
+					src="https://www.youtube.com/embed/7VJ0296JdOA?autoplay=1&mute=1&loop=1&playlist=7VJ0296JdOA&controls=0&showinfo=0&rel=0&modestbranding=1"
+					frameborder="0" allow="autoplay; encrypted-media"
+					style="position: absolute; top: 50%; left: 50%; width: 100vw; height: 56.25vw; min-height: 100vh; min-width: 177.77vh; transform: translate(-50%, -50%); pointer-events: none;"></iframe>
+			</div>
+
+			<!-- Overlay for faded edges and watermark effect (mesh/pattern) -->
+			<div class="video-overlay" id="bg-video-overlay"
+				style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; background: linear-gradient(to right, var(--bg-secondary, #1e1e1e) 0%, rgba(30,30,30,0.2) 20%, rgba(30,30,30,0.2) 80%, var(--bg-secondary, #1e1e1e) 100%), rgba(0,0,0,0.4); transition: opacity 0.5s ease;">
+			</div>
+
+			<div class="inner" id="sound-demo-content"
+				style="position: relative; z-index: 2; transition: opacity 0.5s ease; width: 100%;">
 				<header class="major">
 					<h2>Falcon Drums<br />
 						Bringing the Future to your drums</h2>
 					<p>Elevate Your Sound: Cutting-Edge 3D-Printed Drums with Custom-Engineered Sound, Precision<br />
 						and Commitment to Sustainability, Designed for Drummers Who Demand the Best</p>
 				</header>
+				<ul class="actions special">
+					<li><a href="#" id="play-demo-btn" class="button primary">Play Video</a></li>
+				</ul>
 				<!--ul class="icons major">
 								<li><span class="icon fa-gem major style1"><span class="label">Lorem</span></span></li>
 								<li><span class="icon fa-heart major style2"><span class="label">Ipsum</span></span></li>
@@ -77,6 +96,45 @@
 						</ul-->
 			</div>
 		</section>
+
+		<script>
+			document.addEventListener('DOMContentLoaded', function () {
+				var playBtn = document.getElementById('play-demo-btn');
+				if (playBtn) {
+					playBtn.addEventListener('click', function (e) {
+						e.preventDefault();
+
+						// Hide content and overlay
+						document.getElementById('sound-demo-content').style.opacity = '0';
+						document.getElementById('sound-demo-content').style.pointerEvents = 'none';
+						document.getElementById('bg-video-overlay').style.opacity = '0';
+
+						// Switch background iframe to foreground playable mode
+						var bgContainer = document.getElementById('bg-video-container');
+						bgContainer.style.pointerEvents = 'auto'; // allow interaction
+						bgContainer.style.zIndex = '5'; // bring above overlay
+
+						// Replace iframe with a player that has controls, sound, and normal aspect ratio within container
+						bgContainer.innerHTML = '<div style="position: absolute; top: 50%; left: 50%; width: 90%; max-width: 900px; aspect-ratio: 16/9; transform: translate(-50%, -50%); border-radius: 8px; box-shadow: 0 10px 40px rgba(0,0,0,0.8); z-index: 10;"><iframe src="https://www.youtube.com/embed/7VJ0296JdOA?autoplay=1&controls=1&rel=0&showinfo=0" frameborder="0" allow="autoplay; encrypted-media; fullscreen" allowfullscreen style="width: 100%; height: 100%; border-radius: 8px;"></iframe></div><a href="#" id="close-demo-btn" style="position:absolute; top: 20px; right: 20px; color: white; font-size: 30px; text-decoration: none; z-index: 20; font-family: sans-serif; background: rgba(0,0,0,0.5); width: 40px; height: 40px; text-align: center; border-radius: 50%; line-height: 35px; box-shadow: 0 0 10px rgba(0,0,0,0.5);">&times;</a>';
+
+						// Add close functionality
+						document.getElementById('close-demo-btn').addEventListener('click', function (ce) {
+							ce.preventDefault();
+							// Restore everything
+							document.getElementById('sound-demo-content').style.opacity = '1';
+							document.getElementById('sound-demo-content').style.pointerEvents = 'auto';
+							document.getElementById('bg-video-overlay').style.opacity = '1';
+
+							bgContainer.style.pointerEvents = 'none';
+							bgContainer.style.zIndex = '0';
+
+							// Put back background looping video
+							bgContainer.innerHTML = '<iframe id="bg-youtube-player" src="https://www.youtube.com/embed/7VJ0296JdOA?autoplay=1&mute=1&loop=1&playlist=7VJ0296JdOA&controls=0&showinfo=0&rel=0&modestbranding=1" frameborder="0" allow="autoplay; encrypted-media" style="position: absolute; top: 50%; left: 50%; width: 100vw; height: 56.25vw; min-height: 100vh; min-width: 177.77vh; transform: translate(-50%, -50%); pointer-events: none;"></iframe>';
+						});
+					});
+				}
+			});
+		</script>
 
 		<!-- Two -->
 		<section id="two" class="wrapper alt style2">
