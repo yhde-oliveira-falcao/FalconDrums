@@ -1098,6 +1098,12 @@
                 loadedCount++;
                 if (loadingElement) loadingElement.textContent = `Loading... ${Math.round((loadedCount / partFiles.length) * 100)}%`;
                 if (loadedCount === partFiles.length) onAllPartsLoaded();
+            }, undefined, (err) => {
+                // File not found or failed to load — skip it gracefully
+                console.warn(`Could not load ${file.name} (${file.url}):`, err);
+                loadedCount++;
+                if (loadingElement) loadingElement.textContent = `Loading... ${Math.round((loadedCount / partFiles.length) * 100)}%`;
+                if (loadedCount === partFiles.length) onAllPartsLoaded();
             });
         });
 
