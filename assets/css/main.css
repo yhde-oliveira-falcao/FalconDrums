@@ -3566,7 +3566,6 @@ button:disabled,
 	position: absolute;
 	right: 0;
 	top: 0;
-	vertical-align: middle;
 	width: 7em;
 }
 
@@ -3600,76 +3599,138 @@ body.is-menu-visible #menu {
 	-webkit-transition: background-color 0.2s ease;
 	-ms-transition: background-color 0.2s ease;
 	transition: background-color 0.2s ease;
-	background: #2e3842;
-	height: 3em;
+	background: #1a1f24;
+	height: 4em;
 	left: 0;
-	line-height: 3em;
+	line-height: 4em;
 	position: fixed;
 	top: 0;
 	width: 100%;
 	z-index: 10000;
+	display: flex;
+	align-items: center;
+	padding: 0 1.5em;
+	box-shadow: 0 2px 16px rgba(0,0,0,0.5);
+	border-bottom: 1px solid rgba(255,255,255,0.06);
 }
 
+/* === LOGO / BRAND BLOCK (left) === */
 #header h1 {
 	-moz-transition: opacity 0.2s ease;
 	-webkit-transition: opacity 0.2s ease;
 	-ms-transition: opacity 0.2s ease;
 	transition: opacity 0.2s ease;
-	height: inherit;
-	left: 1.25em;
-	line-height: inherit;
-	position: absolute;
-	top: 0;
+	position: static;
+	height: auto;
+	line-height: normal;
+	margin: 0;
+	flex-shrink: 0;
 }
 
 #header h1 a {
 	border: 0;
-	display: block;
-	height: inherit;
-	line-height: inherit;
+	display: flex;
+	align-items: center;
+	gap: 0.55em;
+	text-decoration: none;
+	color: #fff;
+	font-size: 0.85em;
+	font-weight: 800;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	white-space: nowrap;
 }
 
-@media screen and (max-width: 736px) {
-
-	#header h1 a {
-		font-size: 0.8em;
-	}
-
+#header h1 a .logo-img {
+	height: 2.4em;
+	width: auto;
+	vertical-align: middle;
+	display: inline-block;
 }
 
+#header h1 a .brand-name {
+	display: inline-block;
+	color: #fff;
+	font-size: 1em;
+	vertical-align: middle;
+}
+
+/* === CENTER NAV (desktop) === */
 #header nav {
-	height: inherit;
-	line-height: inherit;
-	position: absolute;
-	right: 0;
-	top: 0;
+	flex: 1;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100%;
+	position: static;
 }
 
 #header nav>ul {
 	list-style: none;
 	margin: 0;
 	padding: 0;
-	white-space: nowrap;
+	display: flex;
+	align-items: center;
+	gap: 0;
 }
 
 #header nav>ul>li {
-	display: inline-block;
+	display: inline-flex;
+	align-items: center;
 	padding: 0;
 }
 
-#header nav>ul>li>a {
+/* Separator between items, like TAMA */
+#header nav>ul>li + li::before {
+	content: '';
+	display: inline-block;
+	width: 1px;
+	height: 1em;
+	background: rgba(255,255,255,0.25);
+	vertical-align: middle;
+}
+
+/* Hide the old hamburger-only item on desktop */
+#header nav>ul>li.special {
+	display: none;
+}
+
+/* Actual inline nav links */
+#header nav>ul>li>a.nav-link {
+	border: 0;
+	color: rgba(255,255,255,0.82);
+	display: block;
+	font-size: 0.72em;
+	letter-spacing: 0.2em;
+	padding: 0 1.3em;
+	text-transform: uppercase;
+	white-space: nowrap;
+	transition: color 0.2s ease;
+	line-height: 4em;
+}
+
+#header nav>ul>li>a.nav-link:hover {
+	color: #d4af37;
+}
+
+/* Active / current page highlight */
+#header nav>ul>li>a.nav-link.active {
+	color: #d4af37;
+	border-bottom: 2px solid #d4af37;
+}
+
+/* Mobile hamburger button — keep for small screens */
+#header nav>ul>li>a.menuToggle {
+	outline: 0;
+	position: relative;
 	border: 0;
 	color: #fff;
-	display: block;
 	font-size: 0.8em;
 	letter-spacing: 0.225em;
 	padding: 0 1.5em;
 	text-transform: uppercase;
-}
-
-#header nav>ul>li>a.menuToggle {
-	outline: 0;
-	position: relative;
+	display: block;
+	line-height: 4em;
 }
 
 #header nav>ul>li>a.menuToggle:after {
@@ -3683,37 +3744,57 @@ body.is-menu-visible #menu {
 	width: 2em;
 }
 
+#header.alt {
+	background: rgba(0,0,0,0.15);
+	backdrop-filter: blur(4px);
+	-webkit-backdrop-filter: blur(4px);
+	box-shadow: none;
+	border-bottom-color: transparent;
+}
+
+/* On the banner page, logo animates in */
+#header.alt h1 {
+	opacity: 1;
+	pointer-events: auto;
+}
+
+/* === RESPONSIVE: hide inline links, show burger === */
 @media screen and (max-width: 736px) {
 
-	#header nav>ul>li>a.menuToggle {
-		padding: 0 1.5em;
+	#header {
+		height: 3.5em;
+		line-height: 3.5em;
+	}
+
+	#header h1 a .brand-name {
+		display: none;
+	}
+
+	#header h1 a .logo-img {
+		height: 2em;
+	}
+
+	/* Hide inline desktop links — keep only burger li */
+	#header nav>ul>li.nav-item-desktop {
+		display: none;
+	}
+
+	#header nav>ul>li.special {
+		display: flex;
+	}
+
+	#header nav>ul>li + li::before {
+		display: none;
 	}
 
 	#header nav>ul>li>a.menuToggle span {
 		display: none;
 	}
 
-}
-
-@media screen and (max-width: 736px) {
-
-	#header nav>ul>li>a {
-		padding: 0 0 0 1.5em;
+	#header nav {
+		justify-content: flex-end;
 	}
 
-}
-
-#header nav>ul>li:first-child {
-	margin-left: 0;
-}
-
-#header.alt {
-	background: transparent;
-}
-
-#header.alt h1 {
-	pointer-events: none;
-	opacity: 0;
 }
 
 /* Banner */
