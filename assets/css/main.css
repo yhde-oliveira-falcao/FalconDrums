@@ -3655,14 +3655,14 @@ body.is-menu-visible #menu {
 	vertical-align: middle;
 }
 
-/* === CENTER NAV (desktop) === */
+/* === CENTER NAV (desktop) — truly centered across full header === */
 #header nav {
-	flex: 1;
+	position: absolute;
+	left: 50%;
+	transform: translateX(-50%);
 	display: flex;
-	justify-content: center;
 	align-items: center;
 	height: 100%;
-	position: static;
 }
 
 #header nav>ul {
