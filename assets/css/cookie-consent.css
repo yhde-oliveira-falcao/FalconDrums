@@ -90,17 +90,24 @@
     transition: all 0.2s ease;
     white-space: nowrap;
     font-family: inherit;
+    line-height: 1.2;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .cookie-btn-accept {
     background: #d4af37;
     border-color: #d4af37;
-    color: #000;
+    color: #000 !important;
+    font-weight: 700;
+    text-shadow: none;
 }
 
 .cookie-btn-accept:hover {
     background: #f0d080;
     border-color: #f0d080;
+    color: #000 !important;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(212, 175, 55, 0.4);
 }
