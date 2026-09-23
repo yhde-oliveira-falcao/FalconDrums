@@ -1,0 +1,214 @@
+/**
+ * Cookie Consent Banner Styles
+ * GDPR & PIPEDA Compliant Design
+ */
+
+.cookie-consent-banner {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
+    border-top: 2px solid #d4af37;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.8);
+    padding: 24px 20px;
+    z-index: 99999;
+    transform: translateY(100%);
+    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+.cookie-consent-banner.cookie-consent-visible {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.cookie-consent-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+
+.cookie-consent-text {
+    flex: 1;
+    min-width: 300px;
+}
+
+.cookie-consent-text h3 {
+    color: #d4af37;
+    font-size: 1.1em;
+    margin: 0 0 10px 0;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.cookie-consent-text p {
+    color: #bbb;
+    font-size: 0.9em;
+    line-height: 1.6;
+    margin: 0 0 8px 0;
+}
+
+.cookie-consent-links {
+    font-size: 0.85em !important;
+    margin-top: 8px !important;
+}
+
+.cookie-consent-links a {
+    color: #d4af37;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+    padding-bottom: 1px;
+    transition: border-color 0.2s ease;
+}
+
+.cookie-consent-links a:hover {
+    border-bottom-color: #d4af37;
+}
+
+.cookie-consent-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.cookie-btn {
+    padding: 12px 24px;
+    border: 2px solid;
+    border-radius: 6px;
+    font-size: 0.9em;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    font-family: inherit;
+}
+
+.cookie-btn-accept {
+    background: #d4af37;
+    border-color: #d4af37;
+    color: #000;
+}
+
+.cookie-btn-accept:hover {
+    background: #f0d080;
+    border-color: #f0d080;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.4);
+}
+
+.cookie-btn-essential {
+    background: transparent;
+    border-color: #d4af37;
+    color: #d4af37;
+}
+
+.cookie-btn-essential:hover {
+    background: rgba(212, 175, 55, 0.1);
+    border-color: #f0d080;
+    color: #f0d080;
+}
+
+.cookie-btn-decline {
+    background: transparent;
+    border-color: #666;
+    color: #999;
+}
+
+.cookie-btn-decline:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: #888;
+    color: #bbb;
+}
+
+/* Focus styles for accessibility */
+.cookie-btn:focus {
+    outline: 3px solid #d4af37;
+    outline-offset: 3px;
+}
+
+.cookie-consent-links a:focus {
+    outline: 2px solid #d4af37;
+    outline-offset: 2px;
+}
+
+/* Animation for slideUp */
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .cookie-consent-banner {
+        padding: 20px 16px;
+    }
+
+    .cookie-consent-content {
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+    }
+
+    .cookie-consent-text {
+        min-width: 100%;
+    }
+
+    .cookie-consent-actions {
+        width: 100%;
+        flex-direction: column;
+    }
+
+    .cookie-btn {
+        width: 100%;
+        padding: 14px 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .cookie-consent-text h3 {
+        font-size: 1em;
+    }
+
+    .cookie-consent-text p {
+        font-size: 0.85em;
+    }
+
+    .cookie-btn {
+        font-size: 0.85em;
+        padding: 12px 16px;
+    }
+}
+
+/* Animation for banner entrance */
+@keyframes slideUpBanner {
+    from {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Print styles - hide banner when printing */
+@media print {
+    .cookie-consent-banner {
+        display: none;
+    }
+}

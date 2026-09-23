@@ -1,0 +1,111 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<title>Order Confirmed - Falcon Drums</title>
+	<link rel="icon" type="image/png" href="images/logo.png">
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+	<link rel="stylesheet" href="assets/css/main.css" />
+	<link rel="stylesheet" href="assets/css/dark-theme.css" />
+	<style>
+		.success-container {
+			max-width: 600px;
+			margin: 100px auto;
+			padding: 60px 40px;
+			text-align: center;
+			background: rgba(255, 255, 255, 0.02);
+			border: 1px solid rgba(212, 175, 55, 0.2);
+			border-radius: 14px;
+		}
+		.success-icon {
+			font-size: 4em;
+			color: #4CAF50;
+			margin-bottom: 20px;
+		}
+		.success-container h1 {
+			color: #d4af37;
+			margin-bottom: 20px;
+		}
+		.success-container p {
+			color: #aaa;
+			line-height: 1.8;
+			margin-bottom: 30px;
+		}
+		.order-details {
+			background: rgba(0, 0, 0, 0.3);
+			padding: 20px;
+			border-radius: 8px;
+			margin: 30px 0;
+			text-align: left;
+		}
+		.order-details p {
+			margin: 10px 0;
+			font-size: 0.9em;
+		}
+		.order-details strong {
+			color: #fff;
+		}
+		.btn-home {
+			display: inline-block;
+			background: #d4af37;
+			color: #000 !important;
+			padding: 12px 30px;
+			border-radius: 4px;
+			text-decoration: none;
+			font-weight: 700;
+			letter-spacing: 0.1em;
+			text-transform: uppercase;
+			font-size: 0.85em;
+		}
+		.btn-home:hover {
+			background: #b59020;
+		}
+	</style>
+</head>
+<body class="landing is-preload">
+	<div id="page-wrapper">
+		<header id="header" class="alt">
+			<h1><a href="index.html"><img src="images/logo.png" alt="Falcon Drums" class="logo-img"><span class="brand-name">Falcon Drums</span></a></h1>
+		</header>
+
+		<div class="success-container">
+			<div class="success-icon">✓</div>
+			<h1>Order Confirmed!</h1>
+			<p>Thank you for your purchase. Your order has been successfully placed and payment confirmed.</p>
+			
+			<div id="orderDetails" class="order-details">
+				<p><strong>Order ID:</strong> <span id="orderId">Loading...</span></p>
+				<p><strong>Tracking Number:</strong> <span id="trackingNumber">Processing...</span></p>
+				<p id="trackingLinkContainer" style="display:none;">
+					<a id="trackingLink" href="#" target="_blank" style="color: #d4af37;">Track Your Shipment →</a>
+				</p>
+			</div>
+
+			<p>We'll send you a confirmation email with your order details and tracking information shortly.</p>
+			
+			<a href="index.html" class="btn-home">Return to Home</a>
+		</div>
+
+		<footer id="footer">
+			<ul class="copyright">
+				<li>&copy; Falcon Drums - All Rights Reserved</li>
+			</ul>
+		</footer>
+	</div>
+
+	<script>
+		// Get order ID from URL
+		const urlParams = new URLSearchParams(window.location.search);
+		const token = urlParams.get('token');
+		
+		if (token) {
+			document.getElementById('orderId').textContent = token;
+			
+			// You could make an API call here to get full order details
+			// For now, we'll just show the order ID
+		} else {
+			document.getElementById('orderId').textContent = 'Not available';
+		}
+	</script>
+</body>
+</html>

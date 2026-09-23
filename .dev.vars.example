@@ -1,0 +1,18 @@
+# PayPal Configuration
+# Get these from https://developer.paypal.com/dashboard/
+PAYPAL_CLIENT_ID=your_paypal_client_id
+PAYPAL_CLIENT_SECRET=your_paypal_client_secret
+PAYPAL_MODE=sandbox
+
+# EasyPost API Key
+# Get from https://www.easypost.com/
+EASYPOST_API_KEY=your_easypost_api_key
+
+# Shipping Origin Address
+SHIP_FROM_NAME=Falcon Drums
+SHIP_FROM_STREET1=Your Street Address
+SHIP_FROM_CITY=Your City
+SHIP_FROM_STATE=Your Province
+SHIP_FROM_ZIP=Your Postal Code
+SHIP_FROM_COUNTRY=CA
+SHIP_FROM_PHONE=+1234567890

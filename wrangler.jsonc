@@ -1,0 +1,30 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "falcon-drums-api",
+  "main": "src/worker.ts",
+  "compatibility_date": "2026-05-01",
+  "compatibility_flags": ["nodejs_compat_v2"],
+  
+  // D1 Database for storing orders
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "falcon-drums-orders",
+      "database_id": "cdb36f41-b9a2-44ae-a3db-b91522126648"
+    }
+  ],
+
+  // Environment variables (non-sensitive)
+  "vars": {
+    "ALLOWED_ORIGINS": "https://falcondrums.com,http://localhost:8080"
+  },
+
+  // Development environment
+  "env": {
+    "dev": {
+      "vars": {
+        "ALLOWED_ORIGINS": "*"
+      }
+    }
+  }
+}

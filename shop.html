@@ -13,6 +13,7 @@
 		<link rel="stylesheet" href="assets/css/noscript.css" />
 	</noscript>
 	<link rel="stylesheet" href="assets/css/dark-theme.css" />
+	<link rel="stylesheet" href="assets/css/cookie-consent.css" />
 	<style>
 		/* ── Shop Page Layout ── */
 		.shop-page {
@@ -589,6 +590,298 @@
 		.gallery-img.active {
 			cursor: zoom-in;
 		}
+
+		/* ── Checkout Modal ── */
+		.checkout-overlay {
+			position: fixed;
+			inset: 0;
+			z-index: 10000;
+			background: rgba(0, 0, 0, 0.85);
+			display: none;
+			align-items: center;
+			justify-content: center;
+			backdrop-filter: blur(4px);
+			overflow-y: auto;
+			padding: 20px;
+		}
+
+		.checkout-overlay.active {
+			display: flex;
+		}
+
+		.checkout-modal {
+			background: #1a1a1a;
+			border: 1px solid rgba(212, 175, 55, 0.3);
+			border-radius: 14px;
+			max-width: 600px;
+			width: 100%;
+			max-height: 90vh;
+			overflow-y: auto;
+			position: relative;
+		}
+
+		.checkout-header {
+			padding: 30px;
+			border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+		}
+
+		.checkout-header h2 {
+			color: #d4af37;
+			font-size: 1.5em;
+			margin: 0 0 10px;
+		}
+
+		.checkout-header p {
+			color: #888;
+			font-size: 0.9em;
+			margin: 0;
+		}
+
+		.checkout-close {
+			position: absolute;
+			top: 20px;
+			right: 20px;
+			background: transparent;
+			border: none;
+			color: #888;
+			font-size: 1.8em;
+			cursor: pointer;
+			width: 32px;
+			height: 32px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			border-radius: 50%;
+			transition: all 0.2s ease;
+		}
+
+		.checkout-close:hover {
+			color: #d4af37;
+			background: rgba(212, 175, 55, 0.1);
+		}
+
+		.checkout-body {
+			padding: 30px;
+		}
+
+		.checkout-section {
+			margin-bottom: 30px;
+		}
+
+		.checkout-section h3 {
+			color: #fff;
+			font-size: 0.75em;
+			letter-spacing: 2px;
+			text-transform: uppercase;
+			margin-bottom: 15px;
+			padding-bottom: 8px;
+			border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+		}
+
+		.form-group {
+			margin-bottom: 15px;
+		}
+
+		.form-group label {
+			display: block;
+			color: #aaa;
+			font-size: 0.85em;
+			margin-bottom: 6px;
+			letter-spacing: 0.5px;
+		}
+
+		.form-group input,
+		.form-group select {
+			width: 100%;
+			padding: 12px 15px;
+			background: rgba(0, 0, 0, 0.3);
+			border: 1px solid rgba(255, 255, 255, 0.1);
+			border-radius: 6px;
+			color: #fff;
+			font-size: 0.9em;
+			transition: border-color 0.2s ease;
+		}
+
+		.form-group input:focus,
+		.form-group select:focus {
+			outline: none;
+			border-color: #d4af37;
+		}
+
+		.form-row {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 15px;
+		}
+
+		.shipping-rates {
+			display: none;
+		}
+
+		.shipping-rates.active {
+			display: block;
+		}
+
+		.shipping-option {
+			background: rgba(0, 0, 0, 0.2);
+			border: 2px solid rgba(255, 255, 255, 0.1);
+			border-radius: 8px;
+			padding: 15px;
+			margin-bottom: 10px;
+			cursor: pointer;
+			transition: all 0.2s ease;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+
+		.shipping-option:hover {
+			border-color: rgba(212, 175, 55, 0.3);
+		}
+
+		.shipping-option.selected {
+			border-color: #d4af37;
+			background: rgba(212, 175, 55, 0.1);
+		}
+
+		.shipping-option input[type="radio"] {
+			margin-right: 12px;
+		}
+
+		.shipping-info {
+			flex: 1;
+		}
+
+		.shipping-carrier {
+			color: #fff;
+			font-weight: 600;
+			font-size: 0.9em;
+		}
+
+		.shipping-service {
+			color: #888;
+			font-size: 0.8em;
+		}
+
+		.shipping-price {
+			color: #d4af37;
+			font-weight: 700;
+			font-size: 1em;
+		}
+
+		.order-summary {
+			background: rgba(0, 0, 0, 0.3);
+			border-radius: 8px;
+			padding: 20px;
+			margin-top: 20px;
+		}
+
+		.summary-row {
+			display: flex;
+			justify-content: space-between;
+			margin-bottom: 10px;
+			color: #aaa;
+			font-size: 0.9em;
+		}
+
+		.summary-row.total {
+			border-top: 1px solid rgba(212, 175, 55, 0.2);
+			padding-top: 10px;
+			margin-top: 10px;
+			font-size: 1.1em;
+			font-weight: 700;
+			color: #fff;
+		}
+
+		.summary-row .amount {
+			color: #fff;
+		}
+
+		.btn-checkout {
+			width: 100%;
+			background: #d4af37;
+			color: #000 !important;
+			border: none;
+			padding: 15px;
+			border-radius: 6px;
+			font-size: 0.9em;
+			font-weight: 700;
+			letter-spacing: 0.1em;
+			text-transform: uppercase;
+			cursor: pointer;
+			transition: background 0.2s ease;
+			margin-top: 20px;
+		}
+
+		.btn-checkout:hover {
+			background: #b59020;
+		}
+
+		.btn-checkout:disabled {
+			background: #666;
+			cursor: not-allowed;
+			opacity: 0.6;
+		}
+
+		.loading-spinner {
+			display: none;
+			text-align: center;
+			padding: 20px;
+		}
+
+		.loading-spinner.active {
+			display: block;
+		}
+
+		.spinner {
+			border: 3px solid rgba(212, 175, 55, 0.1);
+			border-top: 3px solid #d4af37;
+			border-radius: 50%;
+			width: 40px;
+			height: 40px;
+			animation: spin 1s linear infinite;
+			margin: 0 auto;
+		}
+
+		@keyframes spin {
+			0% { transform: rotate(0deg); }
+			100% { transform: rotate(360deg); }
+		}
+
+		.error-message {
+			background: rgba(255, 0, 0, 0.1);
+			border: 1px solid rgba(255, 0, 0, 0.3);
+			color: #ff6b6b;
+			padding: 12px;
+			border-radius: 6px;
+			margin-top: 15px;
+			font-size: 0.85em;
+			display: none;
+		}
+
+		.error-message.active {
+			display: block;
+		}
+
+		#paypal-button-container {
+			margin-top: 20px;
+			display: none;
+		}
+
+		#paypal-button-container.active {
+			display: block;
+		}
+
+		@media (max-width: 640px) {
+			.form-row {
+				grid-template-columns: 1fr;
+			}
+			
+			.checkout-modal {
+				max-width: 100%;
+				margin: 10px;
+			}
+		}
 	</style>
 </head>
 
@@ -725,7 +1018,10 @@
 								</div>
 
 								<div class="product-price-row">
-									<span class="product-price">400+</span>
+									<span class="product-price"><span class="currency">CAD</span>400</span>
+									<button class="btn-quote" onclick="openCheckout('canadian-snare')">
+										Buy Now
+									</button>
 								</div>
 							</div>
 						</div>
@@ -758,8 +1054,9 @@
 						style="width: 50px; height: auto;" /></div>
 			</ul>
 			<ul class="copyright">
-				<li>&copy; All Rights Reserved</li>
+				<li>&copy; Falcon Drums - All Rights Reserved</li>
 				<li>A Website by: <a href="http://zentrofuse.com">ZentroFuse</a></li>
+				<li><a href="privacy-policy.html">Privacy Policy</a> | <a href="cookie-policy.html">Cookie Policy</a></li>
 			</ul>
 		</footer>
 
@@ -773,6 +1070,7 @@
 	<script src="assets/js/breakpoints.min.js"></script>
 	<script src="assets/js/util.js"></script>
 	<script src="assets/js/main.js"></script>
+	<script src="assets/js/cookie-consent.js"></script>
 
 	<script>
 		// ── Image Gallery Logic ──
@@ -818,6 +1116,114 @@
 		<button class="lightbox-nav next" id="lightbox-next" aria-label="Next image">&#8250;</button>
 		<span class="lightbox-caption" id="lightbox-caption"></span>
 	</div>
+
+	<!-- ── Checkout Modal ── -->
+	<div id="checkout-overlay" class="checkout-overlay">
+		<div class="checkout-modal">
+			<button class="checkout-close" onclick="closeCheckout()">&times;</button>
+			
+			<div class="checkout-header">
+				<h2>Checkout</h2>
+				<p id="product-name">Complete your purchase</p>
+			</div>
+
+			<div class="checkout-body">
+				<!-- Step 1: Shipping Address -->
+				<div class="checkout-section" id="address-section">
+					<h3>Shipping Address</h3>
+					<form id="shipping-form">
+						<div class="form-group">
+							<label for="name">Full Name *</label>
+							<input type="text" id="name" name="name" required>
+						</div>
+						<div class="form-group">
+							<label for="street1">Street Address *</label>
+							<input type="text" id="street1" name="street1" required>
+						</div>
+						<div class="form-group">
+							<label for="street2">Apartment, Suite, etc. (optional)</label>
+							<input type="text" id="street2" name="street2">
+						</div>
+						<div class="form-row">
+							<div class="form-group">
+								<label for="city">City *</label>
+								<input type="text" id="city" name="city" required>
+							</div>
+							<div class="form-group">
+								<label for="state">State/Province *</label>
+								<input type="text" id="state" name="state" required>
+							</div>
+						</div>
+						<div class="form-row">
+							<div class="form-group">
+								<label for="zip">Postal Code *</label>
+								<input type="text" id="zip" name="zip" required>
+							</div>
+							<div class="form-group">
+								<label for="country">Country *</label>
+								<select id="country" name="country" required>
+									<option value="CA">Canada</option>
+									<option value="US">United States</option>
+									<option value="MX">Mexico</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="phone">Phone Number (optional)</label>
+							<input type="tel" id="phone" name="phone">
+						</div>
+						<button type="button" class="btn-checkout" onclick="calculateShipping()">
+							Continue to Shipping
+						</button>
+					</form>
+					<div class="error-message" id="address-error"></div>
+				</div>
+
+				<!-- Step 2: Shipping Options -->
+				<div class="checkout-section shipping-rates" id="shipping-section">
+					<h3>Shipping Method</h3>
+					<div class="loading-spinner" id="shipping-loading">
+						<div class="spinner"></div>
+						<p style="color: #888; margin-top: 10px;">Calculating shipping rates...</p>
+					</div>
+					<div id="shipping-options"></div>
+					<button type="button" class="btn-checkout" onclick="proceedToPayment()" id="continue-payment" disabled>
+						Continue to Payment
+					</button>
+					<div class="error-message" id="shipping-error"></div>
+				</div>
+
+				<!-- Step 3: Order Summary & Payment -->
+				<div class="checkout-section" id="payment-section" style="display: none;">
+					<h3>Order Summary</h3>
+					<div class="order-summary">
+						<div class="summary-row">
+							<span>Product</span>
+							<span class="amount" id="summary-product">$0.00</span>
+						</div>
+						<div class="summary-row">
+							<span>Shipping</span>
+							<span class="amount" id="summary-shipping">$0.00</span>
+						</div>
+						<div class="summary-row total">
+							<span>Total</span>
+							<span class="amount" id="summary-total">$0.00</span>
+						</div>
+					</div>
+
+					<h3 style="margin-top: 30px;">Payment</h3>
+					<p style="color: #888; font-size: 0.85em; margin-bottom: 15px;">
+						Complete your purchase securely with PayPal
+					</p>
+					<div id="paypal-button-container"></div>
+					<div class="error-message" id="payment-error"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- PayPal SDK - Loaded dynamically by cookie-consent.js after user consent -->
+	<!-- IMPORTANT: Replace YOUR_PAYPAL_CLIENT_ID in cookie-consent.js with your actual PayPal Client ID -->
 
 	<script>
 		// ── Lightbox Logic ──
@@ -898,6 +1304,264 @@
 				if (e.key === 'ArrowRight') lightboxNext();
 			});
 		})();
+	</script>
+
+	<script>
+		// ── Checkout Logic ──
+		// For local development: 'http://localhost:8787/api'
+		// For production: 'https://falcon-drums-api.YOUR_SUBDOMAIN.workers.dev/api'
+		const API_URL = 'http://localhost:8787/api';
+		let currentProduct = null;
+		let selectedShippingRate = null;
+		let shipmentId = null;
+
+		function openCheckout(productId) {
+			currentProduct = productId;
+			
+			// Fetch product details from server
+			fetch(`${API_URL}/products/${productId}`)
+				.then(res => res.json())
+				.then(product => {
+					document.getElementById('product-name').textContent = product.name;
+					document.getElementById('checkout-overlay').classList.add('active');
+					document.body.style.overflow = 'hidden';
+				})
+				.catch(error => {
+					console.error('Error loading product:', error);
+					alert('Error loading product. Please try again.');
+				});
+		}
+
+		function closeCheckout() {
+			document.getElementById('checkout-overlay').classList.remove('active');
+			document.body.style.overflow = '';
+			
+			// Reset form
+			document.getElementById('shipping-form').reset();
+			document.getElementById('shipping-section').classList.remove('active');
+			document.getElementById('payment-section').style.display = 'none';
+			document.getElementById('shipping-options').innerHTML = '';
+			selectedShippingRate = null;
+		}
+
+		function getShippingAddress() {
+			return {
+				name: document.getElementById('name').value,
+				street1: document.getElementById('street1').value,
+				street2: document.getElementById('street2').value,
+				city: document.getElementById('city').value,
+				state: document.getElementById('state').value,
+				zip: document.getElementById('zip').value,
+				country: document.getElementById('country').value,
+				phone: document.getElementById('phone').value
+			};
+		}
+
+		async function calculateShipping() {
+			const form = document.getElementById('shipping-form');
+			if (!form.checkValidity()) {
+				form.reportValidity();
+				return;
+			}
+
+			const shippingAddress = getShippingAddress();
+			
+			// Show shipping section and loading
+			document.getElementById('shipping-section').classList.add('active');
+			document.getElementById('shipping-loading').classList.add('active');
+			document.getElementById('address-error').classList.remove('active');
+
+			try {
+				const response = await fetch(`${API_URL}/shipping/rates`, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({
+						productId: currentProduct,
+						shippingAddress: shippingAddress
+					})
+				});
+
+				const data = await response.json();
+
+				if (!response.ok) {
+					throw new Error(data.error || 'Failed to calculate shipping');
+				}
+
+				shipmentId = data.shipmentId;
+				displayShippingRates(data.rates);
+				
+			} catch (error) {
+				console.error('Shipping calculation error:', error);
+				document.getElementById('address-error').textContent = error.message;
+				document.getElementById('address-error').classList.add('active');
+			} finally {
+				document.getElementById('shipping-loading').classList.remove('active');
+			}
+		}
+
+		function displayShippingRates(rates) {
+			const container = document.getElementById('shipping-options');
+			container.innerHTML = '';
+
+			if (rates.length === 0) {
+				container.innerHTML = '<p style="color: #888;">No shipping options available for this address.</p>';
+				return;
+			}
+
+			rates.forEach((rate, index) => {
+				const option = document.createElement('div');
+				option.className = 'shipping-option';
+				option.onclick = () => selectShippingRate(rate, option);
+				
+				const deliveryInfo = rate.delivery_days 
+					? `<br><span class="shipping-service">${rate.service} · ${rate.delivery_days} days</span>`
+					: `<br><span class="shipping-service">${rate.service}</span>`;
+
+				option.innerHTML = `
+					<div class="shipping-info">
+						<div class="shipping-carrier">${rate.carrier}</div>
+						${deliveryInfo}
+					</div>
+					<div class="shipping-price">$${rate.rate.toFixed(2)} ${rate.currency}</div>
+				`;
+				
+				container.appendChild(option);
+			});
+		}
+
+		function selectShippingRate(rate, element) {
+			// Remove previous selection
+			document.querySelectorAll('.shipping-option').forEach(opt => {
+				opt.classList.remove('selected');
+			});
+			
+			// Select new rate
+			element.classList.add('selected');
+			selectedShippingRate = rate;
+			
+			// Enable continue button
+			document.getElementById('continue-payment').disabled = false;
+		}
+
+		async function proceedToPayment() {
+			if (!selectedShippingRate) {
+				alert('Please select a shipping method');
+				return;
+			}
+
+			// Show payment section
+			document.getElementById('payment-section').style.display = 'block';
+			
+			// Fetch product details for summary
+			const response = await fetch(`${API_URL}/products/${currentProduct}`);
+			const product = await response.json();
+			
+			// Update order summary
+			document.getElementById('summary-product').textContent = 
+				`$${product.price.toFixed(2)} ${product.currency}`;
+			document.getElementById('summary-shipping').textContent = 
+				`$${selectedShippingRate.rate.toFixed(2)} ${selectedShippingRate.currency}`;
+			document.getElementById('summary-total').textContent = 
+				`$${(product.price + selectedShippingRate.rate).toFixed(2)} ${product.currency}`;
+			
+			// Initialize PayPal
+			initPayPal();
+			
+			// Scroll to payment section
+			document.getElementById('payment-section').scrollIntoView({ behavior: 'smooth' });
+		}
+
+		function initPayPal() {
+			const container = document.getElementById('paypal-button-container');
+			container.innerHTML = ''; // Clear any existing buttons
+			container.classList.add('active');
+
+			// Check if PayPal SDK is loaded
+			if (!window.paypal) {
+				console.error('PayPal SDK not loaded');
+				return;
+			}
+
+			paypal.Buttons({
+				createOrder: async function() {
+					try {
+						const response = await fetch(`${API_URL}/orders/create`, {
+							method: 'POST',
+							headers: { 'Content-Type': 'application/json' },
+							body: JSON.stringify({
+								productId: currentProduct,
+								shippingRateId: selectedShippingRate.id,
+								shippingAddress: getShippingAddress()
+							})
+						});
+
+						const data = await response.json();
+
+						if (!response.ok) {
+							throw new Error(data.error || 'Failed to create order');
+						}
+
+						return data.orderId;
+					} catch (error) {
+						console.error('Error creating order:', error);
+						document.getElementById('payment-error').textContent = error.message;
+						document.getElementById('payment-error').classList.add('active');
+						throw error;
+					}
+				},
+				onApprove: async function(data) {
+					try {
+						const response = await fetch(`${API_URL}/orders/capture`, {
+							method: 'POST',
+							headers: { 'Content-Type': 'application/json' },
+							body: JSON.stringify({
+								orderId: data.orderID
+							})
+						});
+
+						const result = await response.json();
+
+						if (!response.ok) {
+							throw new Error(result.error || 'Payment capture failed');
+						}
+
+						// Success! Redirect to success page
+						window.location.href = `payment-success.html?token=${data.orderID}`;
+
+					} catch (error) {
+						console.error('Error capturing payment:', error);
+						document.getElementById('payment-error').textContent = 
+							'Payment processing failed. Please contact support.';
+						document.getElementById('payment-error').classList.add('active');
+					}
+				},
+				onError: function(err) {
+					console.error('PayPal error:', err);
+					document.getElementById('payment-error').textContent = 
+						'Payment error occurred. Please try again.';
+					document.getElementById('payment-error').classList.add('active');
+				}
+			}).render('#paypal-button-container');
+			// Initialize PayPal after consent is confirmed
+			setTimeout(function() {
+				if (window.FalconDrumsCookieConsent && window.FalconDrumsCookieConsent.hasConsent()) {
+					// Load PayPal if not already loaded
+					if (!window.paypal && !document.getElementById('paypal-sdk-script')) {
+						const script = document.createElement('script');
+						script.id = 'paypal-sdk-script';
+						script.src = 'https://www.paypal.com/sdk/js?client-id=YOUR_PAYPAL_CLIENT_ID&currency=CAD';
+						script.async = true;
+						script.onload = function() {
+							if (window.initPayPal) window.initPayPal();
+						};
+						document.head.appendChild(script);
+					} else if (window.paypal) {
+						// PayPal already loaded, initialize it
+						initPayPal();
+					}
+				}
+			}, 100);
+		}
 	</script>
 
 </body>
