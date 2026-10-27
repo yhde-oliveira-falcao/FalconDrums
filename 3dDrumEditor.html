@@ -1108,8 +1108,10 @@
         const loadingStatus = document.getElementById('loading-status');
         const loadingVideo = document.getElementById('loading-video');
         let modelReady = false;
+        let filmSkipped = false;
 
         function filmIsOver() {
+            if (filmSkipped) return true;
             if (!loadingVideo || loadingVideo.error) return true;
             return loadingVideo.ended;
         }
@@ -1118,6 +1120,13 @@
             if (!modelReady || !filmIsOver()) return;
             if (loadingElement) loadingElement.style.display = 'none';
             if (loadingVideo) loadingVideo.pause();
+        }
+
+        function skipFilm() {
+            filmSkipped = true;
+            if (loadingStatus) loadingStatus.style.display = 'none';
+            if (loadingVideo) loadingVideo.pause();
+            revealViewer();
         }
 
         if (loadingVideo) {
@@ -1215,16 +1224,36 @@
             drumModel.scale.setScalar(9 / Math.max(size.x, size.y, size.z));
             drumModel.rotation.set(Math.PI / 2, Math.PI, 0);
 
-            // Hide diecast hoops initially
-            if (drumParts.diecastHoopTop) drumParts.diecastHoopTop.visible = false;
-            if (drumParts.diecastHoopBottom) drumParts.diecastHoopBottom.visible = false;
-
             modelReady = true;
             if (loadingStatus && !filmIsOver()) loadingStatus.style.display = 'none';
+            const chosenShell = document.querySelector('.color-swatch.active');
+            const chosenLug = document.querySelector('.lug-swatch.active');
+            const chosenHoop = document.querySelector('.hoop-swatch.active');
+            const chosenBottom = document.querySelector('.hoop-bottom-swatch.active');
+            const finishOf = (swatch) => ({
+                color: swatch.dataset.color,
+                metal: parseFloat(swatch.dataset.metalness) || 0,
+                rough: parseFloat(swatch.dataset.roughness) || 0.5
+            });
+            if (chosenShell) {
+                const finish = finishOf(chosenShell);
+                updateShellColor(finish.color, finish.metal, finish.rough);
+            }
+            if (chosenLug) {
+                const finish = finishOf(chosenLug);
+                updateLugColor(finish.color, finish.metal, finish.rough);
+            }
+            const hoopsDiffer = document.getElementById('hoop-mode-toggle').checked;
+            if (chosenHoop) {
+                const finish = finishOf(chosenHoop);
+                updateHoopColor(finish.color, finish.metal, finish.rough, !hoopsDiffer, 'top');
+            }
+            if (hoopsDiffer && chosenBottom) {
+                const finish = finishOf(chosenBottom);
+                updateHoopColor(finish.color, finish.metal, finish.rough, false, 'bottom');
+            }
+            syncHoopVisibility();
             revealViewer();
-            updateShellColor('#c0c0c0', 0.7, 0.4);
-            updateLugColor('#ffd700', 0.7, 0.4);
-            updateHoopColor('#ffd700', 0.7, 0.4, true);
         }
 
         function updateShellColor(colorHex, metalness = 0.0, roughness = 0.5) {
@@ -1303,6 +1332,7 @@
 
         // Combined toggle (both hoops, shown when Different=OFF)
         diecastToggle.addEventListener('change', (e) => {
+            skipFilm();
             topDiecast = e.target.checked;
             botDiecast = e.target.checked;
             syncHoopVisibility();
@@ -1312,6 +1342,7 @@
 
         // Top hoop individual toggle (shown when Different=ON)
         diecastTopToggle.addEventListener('change', (e) => {
+            skipFilm();
             topDiecast = e.target.checked;
             syncHoopVisibility();
             setColorOptionsDisabled('.hoop-color-options', topDiecast);
@@ -1319,12 +1350,14 @@
 
         // Bottom hoop individual toggle (shown when Different=ON)
         diecastBotToggle.addEventListener('change', (e) => {
+            skipFilm();
             botDiecast = e.target.checked;
             syncHoopVisibility();
             setColorOptionsDisabled('.hoop-bottom-color-options', botDiecast);
         });
 
         hoopToggle.addEventListener('change', (e) => {
+            skipFilm();
             const isDifferent = e.target.checked;
             bottomHoopSection.style.display = isDifferent ? 'block' : 'none';
             hoopTopLabel.textContent = isDifferent ? 'Top Hoop Color' : 'Hoop Color';
@@ -1362,6 +1395,9 @@
         });
 
         document.body.addEventListener('click', (e) => {
+            if (e.target.closest('.color-swatch, .lug-swatch, .hoop-swatch, .hoop-bottom-swatch, .bg-swatch, .switch')) {
+                skipFilm();
+            }
             if (e.target.classList.contains('color-swatch') || e.target.closest('.color-swatch')) {
                 const s = e.target.closest('.color-swatch') || e.target;
                 document.querySelectorAll('.color-swatch').forEach(el => el.classList.remove('active'));
