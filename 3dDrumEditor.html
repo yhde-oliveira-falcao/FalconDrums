@@ -62,6 +62,42 @@
             display: block;
         }
 
+        #loading {
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background: #0c0c0e;
+        }
+
+        #loading-video {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #0c0c0e;
+        }
+
+        #loading-status {
+            position: relative;
+            z-index: 1;
+            margin: 0;
+            padding: 14px 26px;
+            border-radius: 999px;
+            color: #d4af37;
+            font-size: 14px;
+            letter-spacing: 0.08em;
+            background: rgba(12, 12, 14, 0.58);
+            border: 1px solid rgba(212, 175, 55, 0.28);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+        }
+
         /* RIGHT: CONFIG PANEL */
         .panel {
             padding: 100px 32px 32px 32px;
@@ -284,6 +320,34 @@
         .btn-request-quote:active {
             transform: translateY(1px);
             box-shadow: 0 2px 10px rgba(212, 175, 55, 0.3);
+        }
+
+        .btn-showcase {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            margin-bottom: 12px;
+            padding: 16px 20px;
+            background: transparent;
+            color: #f3f0e8;
+            border: 1px solid rgba(212, 175, 55, 0.7);
+            border-radius: 8px;
+            font-family: var(--font);
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            text-decoration: none;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .btn-showcase:hover {
+            color: #121212;
+            background: #d4af37;
+            border-color: #d4af37;
         }
 
         /* MODAL OVERLAY */
@@ -551,8 +615,12 @@
 
             <section class="viewer">
                 <canvas id="viewer3d"></canvas>
-                <div id="loading" style="position: absolute; color: #d4af37; font-size: 14px;">
-                    Loading 3D model...
+                <div id="loading">
+                    <video id="loading-video" autoplay muted loop playsinline
+                        poster="images/videos/falcon-snare-explode.gif">
+                        <source src="images/videos/falcon-snare-showcase.mp4" type="video/mp4">
+                    </video>
+                    <p id="loading-status">Loading 3D model...</p>
                 </div>
             </section>
 
@@ -799,6 +867,7 @@
 
                 <!-- REQUEST A QUOTE BUTTON -->
                 <div class="quote-btn-wrap">
+                    <a class="btn-showcase" href="snare-showcase.html">Showcase Snare Parts Animation</a>
                     <button class="btn-request-quote" id="open-quote-modal" type="button">&#9993;&nbsp; Request a
                         Quote</button>
                 </div>
@@ -1036,6 +1105,8 @@
         const drumParts = { shell: null, lugs: null, hoopTop: null, hoopBottom: null, inserts: null, screws: null };
         const printTexture = createPrintTexture();
         const loadingElement = document.getElementById('loading');
+        const loadingStatus = document.getElementById('loading-status');
+        const loadingVideo = document.getElementById('loading-video');
 
         const partFiles = [
             { name: 'shell', url: './3dObjects/StandardSnareGroup/Shell14x55.glb' },
@@ -1107,13 +1178,13 @@
                     }
                 });
                 loadedCount++;
-                if (loadingElement) loadingElement.textContent = `Loading... ${Math.round((loadedCount / partFiles.length) * 100)}%`;
+                if (loadingStatus) loadingStatus.textContent = `Loading... ${Math.round((loadedCount / partFiles.length) * 100)}%`;
                 if (loadedCount === partFiles.length) onAllPartsLoaded();
             }, undefined, (err) => {
                 // File not found or failed to load — skip it gracefully
                 console.warn(`Could not load ${file.name} (${file.url}):`, err);
                 loadedCount++;
-                if (loadingElement) loadingElement.textContent = `Loading... ${Math.round((loadedCount / partFiles.length) * 100)}%`;
+                if (loadingStatus) loadingStatus.textContent = `Loading... ${Math.round((loadedCount / partFiles.length) * 100)}%`;
                 if (loadedCount === partFiles.length) onAllPartsLoaded();
             });
         });
@@ -1131,6 +1202,7 @@
             if (drumParts.diecastHoopBottom) drumParts.diecastHoopBottom.visible = false;
 
             if (loadingElement) loadingElement.style.display = 'none';
+            if (loadingVideo) loadingVideo.pause();
             updateShellColor('#c0c0c0', 0.7, 0.4);
             updateLugColor('#ffd700', 0.7, 0.4);
             updateHoopColor('#ffd700', 0.7, 0.4, true);

@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Falcon Drums — 14×5.5 Snare</title>
+    <link rel="icon" type="image/png" href="images/logo.png" />
+    <style>
+        :root {
+            --ink: #f3f0e8;
+            --muted: rgba(243, 240, 232, 0.62);
+            --gold: #d4af37;
+            --line: rgba(243, 240, 232, 0.16);
+            --panel: rgba(10, 10, 12, 0.62);
+        }
+
+        * { box-sizing: border-box; }
+
+        html, body {
+            margin: 0;
+            height: 100%;
+            background: #0c0c0e;
+            color: var(--ink);
+            font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+        }
+
+        #stage {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+            opacity: 0;
+            transition: opacity 0.7s ease;
+            touch-action: none;
+        }
+
+        #stage.is-ready { opacity: 1; }
+
+        #loading,
+        #export-overlay {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            background: radial-gradient(ellipse at 50% 42%, #3e3d3c 0%, #232326 42%, #0c0c0e 100%);
+            z-index: 5;
+        }
+
+        #export-overlay { background: rgba(8, 8, 10, 0.72); }
+
+        #loading[hidden],
+        #export-overlay[hidden] { display: none; }
+
+        .load-kicker,
+        #phase {
+            margin: 0;
+            font-size: 11px;
+            letter-spacing: 0.28em;
+            text-transform: uppercase;
+            color: var(--gold);
+        }
+
+        #load-status,
+        #export-label {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 400;
+            color: var(--ink);
+        }
+
+        #brand,
+        #caption,
+        #ui,
+        #present-hint {
+            position: fixed;
+            z-index: 2;
+            transition: opacity 0.45s ease;
+        }
+
+        body.is-present #brand,
+        body.is-present #caption,
+        body.is-present #ui { opacity: 0; pointer-events: none; }
+
+        #present-hint {
+            left: 50%;
+            bottom: 28px;
+            transform: translateX(-50%);
+            margin: 0;
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: var(--panel);
+            border: 1px solid var(--line);
+            backdrop-filter: blur(16px);
+            font-size: 12px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--muted);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        body.is-present #present-hint.is-on { opacity: 1; }
+
+        #brand {
+            top: 28px;
+            left: 32px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        #brand img {
+            width: 46px;
+            height: 46px;
+            object-fit: contain;
+            filter: invert(1);
+            opacity: 0.92;
+        }
+
+        #brand h1 {
+            margin: 2px 0 0;
+            font-size: 22px;
+            font-weight: 500;
+            letter-spacing: 0.01em;
+        }
+
+        #caption {
+            top: 28px;
+            right: 32px;
+            text-align: right;
+            max-width: min(420px, 46vw);
+        }
+
+        #detail {
+            margin: 6px 0 0;
+            font-size: 14px;
+            line-height: 1.45;
+            color: var(--muted);
+        }
+
+        #ui {
+            left: 24px;
+            right: 24px;
+            bottom: 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 14px 16px 12px;
+            border-radius: 18px;
+            background: var(--panel);
+            border: 1px solid var(--line);
+            backdrop-filter: blur(18px);
+            box-shadow: 0 18px 50px rgba(0, 0, 0, 0.28);
+        }
+
+        #finishes {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 2px;
+        }
+
+        .chip {
+            flex: 0 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 12px 7px 8px;
+            border-radius: 999px;
+            border: 1px solid var(--line);
+            background: transparent;
+            color: var(--ink);
+            font: inherit;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .chip.is-on {
+            border-color: var(--gold);
+            color: white;
+        }
+
+        .dots {
+            display: flex;
+        }
+
+        .dots i {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: block;
+            border: 1px solid rgba(0, 0, 0, 0.35);
+            margin-right: -4px;
+        }
+
+        #transport {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        button.icon,
+        button.text,
+        .loop {
+            border: 1px solid var(--line);
+            background: transparent;
+            color: var(--ink);
+            font: inherit;
+            cursor: pointer;
+        }
+
+        button.icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            flex: 0 0 auto;
+        }
+
+        #play {
+            width: 46px;
+            height: 46px;
+            background: var(--gold);
+            color: #1a1406;
+            border-color: transparent;
+        }
+
+        button.text {
+            height: 36px;
+            padding: 0 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        button.text.is-on,
+        button.icon.is-on {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        #play.is-on { color: #1a1406; }
+
+        #scrub {
+            flex: 1 1 auto;
+            min-width: 80px;
+            accent-color: var(--gold);
+            cursor: pointer;
+        }
+
+        #clock {
+            flex: 0 0 auto;
+            font-variant-numeric: tabular-nums;
+            font-size: 12px;
+            letter-spacing: 0.06em;
+            color: var(--muted);
+            min-width: 72px;
+            text-align: right;
+        }
+
+        .loop {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--muted);
+            border: 0;
+            padding: 0 4px;
+        }
+
+        #note {
+            margin: 0;
+            font-size: 11px;
+            letter-spacing: 0.04em;
+            color: rgba(243, 240, 232, 0.42);
+        }
+
+        #note a { color: inherit; }
+
+        @media (max-width: 800px) {
+            #brand { top: 16px; left: 16px; }
+            #brand h1 { font-size: 18px; }
+            #caption { display: none; }
+            #ui { left: 10px; right: 10px; bottom: 10px; }
+            .loop, #export, #present, #note { display: none; }
+        }
+    </style>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <canvas id="stage"></canvas>
+
+    <div id="loading">
+        <p class="load-kicker">Falcon Drums</p>
+        <p id="load-status">Loading the snare…</p>
+    </div>
+
+    <header id="brand">
+        <img src="images/logo.png" alt="" />
+        <div>
+            <p class="load-kicker">Falcon Drums</p>
+            <h1>14 × 5.5 Snare</h1>
+        </div>
+    </header>
+
+    <div id="caption">
+        <p id="phase">Assembled</p>
+        <p id="detail"></p>
+    </div>
+
+    <div id="ui">
+        <div id="finishes" role="group" aria-label="Finishes"></div>
+        <div id="transport">
+            <button type="button" class="icon" id="replay" aria-label="Replay" title="Replay">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                    <path d="M13.5 8a5.5 5.5 0 1 1-1.4-3.7" stroke="currentColor" stroke-width="1.4" />
+                    <path d="M13.6 2.2v3.2H10.4" stroke="currentColor" stroke-width="1.4" />
+                </svg>
+            </button>
+            <button type="button" class="icon" id="play" aria-label="Pause" title="Play or pause">
+                <svg id="icon-pause" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+                    <rect x="3.5" y="2.5" width="3" height="11" rx="0.6" fill="currentColor" />
+                    <rect x="9.5" y="2.5" width="3" height="11" rx="0.6" fill="currentColor" />
+                </svg>
+                <svg id="icon-play" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" hidden>
+                    <path d="M4 2.8v10.4L13.2 8 4 2.8z" fill="currentColor" />
+                </svg>
+            </button>
+            <button type="button" class="text" id="assemble">Assembled</button>
+            <button type="button" class="text" id="explode">Exploded</button>
+            <input id="scrub" type="range" min="0" max="32.6" step="0.01" value="0" aria-label="Timeline" />
+            <span id="clock">0:00 / 0:33</span>
+            <label class="loop"><input id="loop" type="checkbox" checked /> Loop</label>
+            <button type="button" class="text" id="present" title="Hide controls">Present</button>
+            <button type="button" class="text" id="export" title="Render a 1080p MP4">Export MP4</button>
+        </div>
+        <p id="note">Shell, lugs, hoops, inserts, and tension rods from the customizer.
+            <a href="3dDrumEditor.html">Open the customizer</a></p>
+    </div>
+
+    <p id="present-hint">Press Esc for controls</p>
+
+    <div id="export-overlay" hidden>
+        <p class="load-kicker">Export</p>
+        <p id="export-label">Rendering…</p>
+    </div>
+
+    <script type="module" src="assets/js/snare-showcase.js"></script>
+</body>
+
+</html>
