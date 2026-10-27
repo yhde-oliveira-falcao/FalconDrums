@@ -616,7 +616,7 @@
             <section class="viewer">
                 <canvas id="viewer3d"></canvas>
                 <div id="loading">
-                    <video id="loading-video" autoplay muted loop playsinline
+                    <video id="loading-video" autoplay muted playsinline
                         poster="images/videos/falcon-snare-explode.gif">
                         <source src="images/videos/falcon-snare-showcase.mp4" type="video/mp4">
                     </video>
@@ -1107,6 +1107,24 @@
         const loadingElement = document.getElementById('loading');
         const loadingStatus = document.getElementById('loading-status');
         const loadingVideo = document.getElementById('loading-video');
+        let modelReady = false;
+
+        function filmIsOver() {
+            if (!loadingVideo || loadingVideo.error) return true;
+            return loadingVideo.ended;
+        }
+
+        function revealViewer() {
+            if (!modelReady || !filmIsOver()) return;
+            if (loadingElement) loadingElement.style.display = 'none';
+            if (loadingVideo) loadingVideo.pause();
+        }
+
+        if (loadingVideo) {
+            loadingVideo.loop = false;
+            loadingVideo.addEventListener('ended', revealViewer);
+            loadingVideo.addEventListener('error', revealViewer);
+        }
 
         const partFiles = [
             { name: 'shell', url: './3dObjects/StandardSnareGroup/Shell14x55.glb' },
@@ -1201,8 +1219,9 @@
             if (drumParts.diecastHoopTop) drumParts.diecastHoopTop.visible = false;
             if (drumParts.diecastHoopBottom) drumParts.diecastHoopBottom.visible = false;
 
-            if (loadingElement) loadingElement.style.display = 'none';
-            if (loadingVideo) loadingVideo.pause();
+            modelReady = true;
+            if (loadingStatus && !filmIsOver()) loadingStatus.style.display = 'none';
+            revealViewer();
             updateShellColor('#c0c0c0', 0.7, 0.4);
             updateLugColor('#ffd700', 0.7, 0.4);
             updateHoopColor('#ffd700', 0.7, 0.4, true);
